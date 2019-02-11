@@ -4,10 +4,12 @@ import { computePricepoint, computeAmountPoints } from './helpers'
 import { getOrderHash, getRandomNonce } from './crypto'
 import { createWalletFromPrivateKey, createProvider } from "./wallet"
 
+let signer
+
 export const createLocalWalletSigner = async () => {
   const wallet = createWalletFromPrivateKey(process.env.MARKET_MAKER_PRIVATE_KEY)
   const provider = createProvider()
-  const signer = new Wallet(wallet.privateKey, provider)
+  signer = new Wallet(wallet.privateKey, provider)
 
   return signer
 }
@@ -31,22 +33,22 @@ export const createRawOrder = async (params) => {
     const priceMultiplier = utils.bigNumberify(10).pow(18)
     const baseMultiplier = utils.bigNumberify(10).pow(baseTokenDecimals)
     const quoteMultiplier = utils.bigNumberify(10).pow(quoteTokenDecimals)
-    const pricepoint = computePricepoint({ price, priceMultiplier, quoteMultiplier, precisionMultiplier })
-    const amountPoints = computeAmountPoints({ amount, baseMultiplier, precisionMultiplier })
+    // const pricepoint = computePricepoint({ price, priceMultiplier, quoteMultiplier, precisionMultiplier })
+    // const amountPoints = computeAmountPoints({ amount, baseMultiplier, precisionMultiplier })
 
     order.exchangeAddress = exchangeAddress
     order.userAddress = userAddress
     order.baseToken = baseTokenAddress
     order.quoteToken = quoteTokenAddress
-    order.amount = amountPoints.toString()
-    order.pricepoint = pricepoint.toString()
+    order.amount = amount
+    order.pricepoint = price
     order.side = side
     order.makeFee = makeFee
     order.takeFee = takeFee
     order.nonce = getRandomNonce()
     order.hash = getOrderHash(order)
 
-    const signature = await this.signMessage(utils.arrayify(order.hash))
+    const signature = await signer.signMessage(utils.arrayify(order.hash))
     const { r, s, v } = utils.splitSignature(signature)
 
     order.signature = { R: r, S: s, V: v }
