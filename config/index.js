@@ -13,3 +13,5 @@ export const defaultOrderParams = {
 }
 
 export const minimumPriceStepChange = utils.bigNumberify(10).pow(36).div(utils.bigNumberify(1e2)) // 0.01
+
+export const exchangeAddress = '0x0000000000000000000000000000000000000000'
