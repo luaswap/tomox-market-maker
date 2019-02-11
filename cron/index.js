@@ -1,6 +1,7 @@
 const CronJob = require('cron').CronJob
 
-import { fetchOrderBook } from './fetchOrderBook'
+import { fetchOrderBook } from '../services/fetchOrderBook'
+import { prepareOrderParams, createOrder } from '../services/createOrder'
 import { calculateBetterBid, calculateBetterAsk } from '../utils/price'
 
 const runMarketMaker = async () => {
@@ -9,11 +10,18 @@ const runMarketMaker = async () => {
     const bestBid = orderBookData.bids[0]
     const bestAsk = orderBookData.asks[0]
 
-    const newBidOrder = calculateBetterBid(bestBid)
-    const newAskOrder = calculateBetterAsk(bestAsk)
+    let newBidOrder = calculateBetterBid(bestBid)
+    let newAskOrder = calculateBetterAsk(bestAsk)
 
-    console.log(newBidOrder)
-    console.log(newAskOrder)
+    newBidOrder = await prepareOrderParams(newBidOrder.amount, newBidOrder.price, 'BUY')
+    newAskOrder = await prepareOrderParams(newAskOrder.amount, newAskOrder.price, 'SELL')
+
+    // console.log(newBidOrder)
+    // console.log(newAskOrder)
+
+    await createOrder(newBidOrder)
+    await createOrder(newAskOrder)
+
   } catch (err) {
     console.log(err)
   }
@@ -22,4 +30,4 @@ const runMarketMaker = async () => {
 /**
  * Fetch order book
  */
-new CronJob('* * * * * *', runMarketMaker, null, true)
+new CronJob(process.env.CRON_VALUE, runMarketMaker, null, true)

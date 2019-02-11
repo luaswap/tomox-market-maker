@@ -1,5 +1,5 @@
 import { BASE_URL, tokenAddresses, exchangeAddress } from '../config'
-
+import ws from '../utils/socket'
 import { createLocalWalletSigner, createRawOrder } from '../utils/signer'
 import { fetchPair } from '../services/fetchPair'
 
@@ -25,7 +25,8 @@ export const prepareOrderParams = async (amount, price, side) => {
   }
 
   const order = await createRawOrder(params)
-  console.log(order)
+  // console.log(order)
+  ws.send(JSON.stringify(order))
   return order
 }
 
