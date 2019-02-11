@@ -1,8 +1,7 @@
-import { utils } from "ethers"
-import { utils } from "ethers"
+import { utils } from 'ethers'
 
-import { defaultOrderParams, minimumPriceStepChange } from "../config"
-import { printBigNumberToString } from "./print"
+import { defaultOrderParams, minimumPriceStepChange } from '../config'
+import { printBigNumberToString } from './print'
 
 export const calculateBetterBid = (currentBestBid) => {
   const amountMultipler = utils.bigNumberify(10).pow(18)
