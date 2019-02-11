@@ -1,3 +1,5 @@
+import { utils } from "ethers"
+
 export const BASE_URL = process.env.BASE_URL
 
 export const tokenAddresses = {
@@ -9,3 +11,5 @@ export const defaultOrderParams = {
   amount: 100,
   price: 1
 }
+
+export const minimumPriceStepChange = utils.bigNumberify(10).pow(36).div(utils.bigNumberify(1e2)) // 0.01
