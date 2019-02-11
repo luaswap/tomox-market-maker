@@ -9,8 +9,9 @@ export const fetchOrderBook = async (baseToken = null, quoteToken = null) => {
 
     const response = await axios.get(`${BASE_URL}/orderbook?baseToken=${baseToken}&quoteToken=${quoteToken}`)
 
-    console.log(response.data.data)
+    return response.data.data
   } catch (err) {
     console.log(err)
+    return null
   }
 }
