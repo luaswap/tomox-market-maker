@@ -1,12 +1,12 @@
-import { BASE_URL, tokenAddresses, exchangeAddress } from '../config'
+import { exchangeAddress } from '../config'
 import { sendToServer } from '../utils/socket'
 import { createLocalWalletSigner, createRawOrder } from '../utils/signer'
-import { fetchPair } from '../services/fetchPair'
+import { getPair } from './getPair'
 
 export const prepareOrderParams = async (amount, price, side) => {
   const signer = await createLocalWalletSigner()
   const userAddress = await signer.getAddress()
-  const pair = await fetchPair()
+  const pair = await getPair()
 
   const {
     makeFee,
@@ -30,7 +30,7 @@ export const prepareOrderParams = async (amount, price, side) => {
   return order
 }
 
-export const createOrder = async (order, baseToken = null, quoteToken = null) => {
+export const createOrder = async (order) => {
   try {
     const createOrderMessage = {
       channel: 'orders',
