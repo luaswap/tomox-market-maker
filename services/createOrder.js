@@ -1,5 +1,5 @@
 import { BASE_URL, tokenAddresses, exchangeAddress } from '../config'
-import ws from '../utils/socket'
+import { sendToServer } from '../utils/socket'
 import { createLocalWalletSigner, createRawOrder } from '../utils/signer'
 import { fetchPair } from '../services/fetchPair'
 
@@ -26,14 +26,22 @@ export const prepareOrderParams = async (amount, price, side) => {
 
   const order = await createRawOrder(params)
   // console.log(order)
-  ws.send(JSON.stringify(order))
+
   return order
 }
 
 export const createOrder = async (order, baseToken = null, quoteToken = null) => {
   try {
-    baseToken = baseToken || tokenAddresses.ETH
-    quoteToken = quoteToken || tokenAddresses.TOMO
+    const createOrderMessage = {
+      channel: 'orders',
+      event: {
+        type: 'NEW_ORDER',
+        hash: order.hash,
+        payload: order,
+      },
+    }
+
+    sendToServer(createOrderMessage)
 
   } catch (err) {
     console.log(err)
