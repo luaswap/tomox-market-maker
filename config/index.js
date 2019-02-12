@@ -1,6 +1,7 @@
 import { utils } from "ethers"
 
 export const BASE_URL = process.env.BASE_URL
+export const WS_BASE_URL = process.env.WS_BASE_URL
 
 export const tokenAddresses = {
   TOMO: '0x0000000000000000000000000000000000000001',
