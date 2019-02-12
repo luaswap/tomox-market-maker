@@ -1,13 +1,13 @@
 const WebSocket = require('ws')
 
-const ws = new WebSocket('ws://localhost:8080/socket')
+import { WS_BASE_URL } from '../config'
+
+const ws = new WebSocket(WS_BASE_URL)
 
 ws.on('open', function open() {
-  console.log('Websocket connected')
+  console.log('Connected to Websocket')
 })
 
-ws.on('message', function incoming(data) {
-  console.log(data)
-})
-
-export default ws
+export const sendToServer = (message) => {
+  ws.send(JSON.stringify(message))
+}
