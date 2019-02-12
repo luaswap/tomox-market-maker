@@ -4,7 +4,6 @@ const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
-import ws from './utils/socket'
 require('./cron')
 
 const indexRouter = require('./routes/index')
