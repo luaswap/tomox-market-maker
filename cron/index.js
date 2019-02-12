@@ -7,20 +7,22 @@ import { calculateBetterBid, calculateBetterAsk } from '../utils/price'
 const runMarketMaker = async () => {
   try {
     const orderBookData = await fetchOrderBook()
-    const bestBid = orderBookData.bids[0]
-    const bestAsk = orderBookData.asks[0]
 
-    let newBidOrder = calculateBetterBid(bestBid)
-    let newAskOrder = calculateBetterAsk(bestAsk)
+    if (orderBookData.bids.length <= orderBookData.asks.length) {
+      const bestBid = orderBookData.bids[0]
+      let newBidOrder = calculateBetterBid(bestBid)
+      newBidOrder = await prepareOrderParams(newBidOrder.amount, newBidOrder.price, 'BUY')
+      console.log(newBidOrder)
 
-    newBidOrder = await prepareOrderParams(newBidOrder.amount, newBidOrder.price, 'BUY')
-    newAskOrder = await prepareOrderParams(newAskOrder.amount, newAskOrder.price, 'SELL')
+      await createOrder(newBidOrder)
+    } else {
+      const bestAsk = orderBookData.asks[0]
+      let newAskOrder = calculateBetterAsk(bestAsk)
+      newAskOrder = await prepareOrderParams(newAskOrder.amount, newAskOrder.price, 'SELL')
+      console.log(newAskOrder)
 
-    // console.log(newBidOrder)
-    // console.log(newAskOrder)
-
-    await createOrder(newBidOrder)
-    await createOrder(newAskOrder)
+      await createOrder(newAskOrder)
+    }
 
   } catch (err) {
     console.log(err)
