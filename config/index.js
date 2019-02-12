@@ -9,10 +9,12 @@ export const tokenAddresses = {
 }
 
 export const defaultOrderParams = {
-  amount: 100,
-  price: 1
+  amount: 1,
+  price: 1,
 }
 
 export const minimumPriceStepChange = utils.bigNumberify(10).pow(36).div(utils.bigNumberify(1e2)) // 0.01
 
 export const exchangeAddress = '0x0000000000000000000000000000000000000000'
+
+export const coinMarketCapAPI = 'https://pro-api.coinmarketcap.com'
