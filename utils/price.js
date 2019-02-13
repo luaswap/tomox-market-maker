@@ -2,11 +2,14 @@ import { utils } from 'ethers'
 
 import { defaultOrderParams, minimumPriceStepChange } from '../config'
 import { printBigNumberToString } from './print'
+import { randInt } from "./helpers"
 
 export const calculateBigNumberAmount = amount => {
+  const randomNumber = randInt(amount, amount * 10)
+
   const amountMultiplier = utils.bigNumberify(10).pow(18)
 
-  return utils.bigNumberify(amount).mul(amountMultiplier)
+  return utils.bigNumberify(randomNumber).mul(amountMultiplier)
 }
 
 export const calculateCoinmarketcapPrice = price => {
@@ -22,7 +25,7 @@ export const calculateBetterBid = (currentBestBid) => {
   const defaultOrderAmount = calculateBigNumberAmount(defaultOrderParams.amount)
 
   const newBidOrder = {
-    amount: printBigNumberToString(utils.bigNumberify(currentBestBid.amount).gt(defaultOrderAmount) ? defaultOrderAmount : utils.bigNumberify(currentBestBid.amount)),
+    amount: printBigNumberToString(defaultOrderAmount),
     price: printBigNumberToString(utils.bigNumberify(currentBestBid.pricepoint).add(minimumPriceStepChange)),
   }
 
@@ -33,7 +36,7 @@ export const calculateBetterAsk = (currentBestAsk) => {
   const defaultOrderAmount = calculateBigNumberAmount(defaultOrderParams.amount)
 
   const newAskOrder = {
-    amount: printBigNumberToString(utils.bigNumberify(currentBestAsk.amount).gt(defaultOrderAmount) ? defaultOrderAmount : utils.bigNumberify(currentBestAsk.amount)),
+    amount: printBigNumberToString(defaultOrderAmount),
     price: printBigNumberToString(utils.bigNumberify(currentBestAsk.pricepoint).sub(minimumPriceStepChange)),
   }
 
