@@ -11,6 +11,11 @@ export const getMarketQuotes = async (baseTokenSymbol = null, quoteTokenSymbol =
       headers: { 'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY },
     })
 
+    if (response.data.status.error_code !== 0) {
+      console.log(response.data.status.error_message)
+      return
+    }
+
     return response.data.data
   } catch (err) {
     console.log(err)
