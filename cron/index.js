@@ -9,6 +9,9 @@ import { defaultOrderParams } from '../config'
 const runMarketMaker = async () => {
   try {
     const orderBookData = await getOrderBook()
+    if (!orderBookData) {
+      return
+    }
 
     if (orderBookData.bids.length === 0) {
       return await handleEmptyOrderbook('BUY')

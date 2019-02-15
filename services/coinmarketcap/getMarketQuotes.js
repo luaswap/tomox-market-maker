@@ -4,6 +4,7 @@ import { coinMarketCapAPI } from "../../config"
 
 export const getMarketQuotes = async (baseTokenSymbol = null, quoteTokenSymbol = null) => {
   try {
+    console.log('Fetch data from coinmarketcap.com')
     baseTokenSymbol = baseTokenSymbol || 'ETH'
     quoteTokenSymbol = quoteTokenSymbol || 'TOMO'
 

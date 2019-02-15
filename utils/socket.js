@@ -8,6 +8,19 @@ ws.on('open', function open() {
   console.log('Connected to Websocket')
 })
 
+ws.on('error', (err) => {
+  console.log('Connection error')
+  console.log(err)
+})
+
 export const sendToServer = (message) => {
-  ws.send(JSON.stringify(message))
+  try {
+    ws.send(JSON.stringify(message), function ack(err) {
+      if (err) {
+        console.log(err)
+      }
+    })
+  } catch (err) {
+    console.log(err)
+  }
 }
