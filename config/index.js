@@ -15,6 +15,6 @@ export const defaultOrderParams = {
 
 export const minimumPriceStepChange = utils.bigNumberify(10).pow(36).div(utils.bigNumberify(1e2)) // 0.01
 
-export const exchangeAddress = '0x0000000000000000000000000000000000000000'
+export const exchangeAddress = '0xd68c26b99a40227C4AbE51020eDFd9BbA438B297'
 
 export const coinMarketCapAPI = 'https://pro-api.coinmarketcap.com'
