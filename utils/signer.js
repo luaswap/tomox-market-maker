@@ -25,7 +25,7 @@ export const createLocalWalletSigner = async () => {
 export const createRawOrder = async (params) => {
   try {
     const order = {}
-    const { userAddress, exchangeAddress, side, pair, amount, price, makeFee, takeFee } = params
+    const { userAddress, exchangeAddress, side, pair, amount, price } = params
     const { baseTokenAddress, quoteTokenAddress, baseTokenDecimals, quoteTokenDecimals } = pair
 
 
@@ -33,18 +33,18 @@ export const createRawOrder = async (params) => {
     const priceMultiplier = utils.bigNumberify(10).pow(18)
     const baseMultiplier = utils.bigNumberify(10).pow(baseTokenDecimals)
     const quoteMultiplier = utils.bigNumberify(10).pow(quoteTokenDecimals)
-    // const pricepoint = computePricepoint({ price, priceMultiplier, quoteMultiplier, precisionMultiplier })
-    // const amountPoints = computeAmountPoints({ amount, baseMultiplier, precisionMultiplier })
+    const pricepoint = computePricepoint({ price, priceMultiplier, quoteMultiplier, precisionMultiplier })
+    const amountPoints = computeAmountPoints({ amount, baseMultiplier, precisionMultiplier })
 
     order.exchangeAddress = exchangeAddress
     order.userAddress = userAddress
     order.baseToken = baseTokenAddress
     order.quoteToken = quoteTokenAddress
-    order.amount = amount
-    order.pricepoint = price
+    order.amount = amountPoints.toString()
+    order.pricepoint = pricepoint.toString()
     order.side = side
-    order.makeFee = makeFee
-    order.takeFee = takeFee
+    order.makeFee = '0'
+    order.takeFee = '0'
     order.nonce = getRandomNonce()
     order.hash = getOrderHash(order)
 

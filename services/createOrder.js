@@ -1,17 +1,17 @@
+import axios from 'axios'
+
 import { exchangeAddress } from '../config'
-import { sendToServer } from '../utils/socket'
 import { createLocalWalletSigner, createRawOrder } from '../utils/signer'
 import { getPair } from './getPair'
 
-export const prepareOrderParams = async (amount, price, side) => {
+export const prepareOrderParams = async () => {
   const signer = await createLocalWalletSigner()
   const userAddress = await signer.getAddress()
   const pair = await getPair()
 
-  const {
-    makeFee,
-    takeFee,
-  } = pair
+  const side = 'BUY'
+  const amount = 10
+  const price = 250
 
   const params = {
     side,
@@ -20,8 +20,6 @@ export const prepareOrderParams = async (amount, price, side) => {
     pair,
     amount,
     price,
-    makeFee,
-    takeFee,
   }
 
   const order = await createRawOrder(params)
@@ -32,17 +30,20 @@ export const prepareOrderParams = async (amount, price, side) => {
 
 export const createOrder = async (order) => {
   try {
-    const createOrderMessage = {
-      channel: 'orders',
-      event: {
-        type: 'NEW_ORDER',
-        hash: order.hash,
-        payload: order,
+    let params = {}
+    params.topic = ''
+    params.payload = order
+
+    return axios.post(process.env.TOMOCHAIN_NODE_HTTP_URL, {
+      jsonrpc: '2.0',
+      id: +new Date(),
+      method: 'tomoX_createOrder',
+      params: JSON.stringify(params),
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
       },
-    }
-
-    sendToServer(createOrderMessage)
-
+    })
   } catch (err) {
     console.log(err)
     return null
