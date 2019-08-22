@@ -13,6 +13,7 @@ const runMarketMaker = async () => {
       return
     }
 
+    console.log(orderBookData)
     if (orderBookData.bids.length === 0) {
       return await handleEmptyOrderbook('BUY')
     }
@@ -80,6 +81,7 @@ const applyLivePrice = async () => {
  * Fetch order book
  */
 new CronJob(process.env.CRON_VALUE, runMarketMaker, null, true)
+// runMarketMaker()
 
 /**
  * Periodically (10 minutes) get real time price from coinmarketcap.com and create order

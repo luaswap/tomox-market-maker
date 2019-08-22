@@ -4,7 +4,7 @@ import { BASE_URL, tokenAddresses } from '../config'
 
 export const getOrderBook = async (baseToken = null, quoteToken = null) => {
   try {
-    baseToken = baseToken || tokenAddresses.ETH
+    baseToken = baseToken || tokenAddresses.BTC
     quoteToken = quoteToken || tokenAddresses.TOMO
 
     const response = await axios.get(`${BASE_URL}/orderbook?baseToken=${baseToken}&quoteToken=${quoteToken}`)
