@@ -5,7 +5,8 @@ export const WS_BASE_URL = process.env.WS_BASE_URL
 
 export const tokenAddresses = {
   TOMO: process.env.TOMO_ADDRESS,
-  BTC: process.env.BTC_ADDRESS
+  BTC: process.env.BTC_ADDRESS,
+  ETH: process.env.ETH_ADDRESS
 }
 
 export const defaultOrderParams = {
