@@ -1,7 +1,7 @@
 import { utils, Wallet } from 'ethers'
 
 import { computePricepoint, computeAmountPoints } from './helpers'
-import { getOrderHash, getRandomNonce } from './crypto'
+import { getOrderHash, getNonce } from './crypto'
 import { createWalletFromPrivateKey, createProvider } from "./wallet"
 
 let signer
@@ -45,7 +45,7 @@ export const createRawOrder = async (params) => {
     order.side = side
     order.makeFee = makeFee
     order.takeFee = takeFee
-    order.nonce = getRandomNonce()
+    order.nonce = await getNonce()
     order.hash = getOrderHash(order)
 
     const signature = await signer.signMessage(utils.arrayify(order.hash))

@@ -1,5 +1,6 @@
 import { utils } from 'ethers'
 import { randInt } from './helpers'
+import axios from 'axios'
 
 export const getOrderHash = order => {
   return utils.solidityKeccak256(
@@ -30,6 +31,15 @@ export const getOrderHash = order => {
   )
 }
 
-export const getRandomNonce = () => {
-  return randInt(0, 1e16).toString()
+export const getNonce = async () => {
+  let nonce = 0
+  try {
+      const response = await axios.get(`${process.env.BASE_URL}/orders/count?address=${process.env.MARKET_MAKER_ADDRESS}`)
+      nonce = response.data.data ? String(response.data.data + 1) : '0'
+  } catch (e) {
+      console.log(e)
+      nonce = 0
+  }
+
+  return String(nonce)
 }

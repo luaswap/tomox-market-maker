@@ -5,7 +5,7 @@ import { coinMarketCapAPI } from "../../config"
 export const getMarketQuotes = async (baseTokenSymbol = null, quoteTokenSymbol = null) => {
   try {
     console.log('Fetch data from coinmarketcap.com')
-    baseTokenSymbol = baseTokenSymbol || 'ETH'
+    baseTokenSymbol = baseTokenSymbol || 'BTC'
     quoteTokenSymbol = quoteTokenSymbol || 'TOMO'
 
     const response = await axios.get(`${coinMarketCapAPI}/v1/cryptocurrency/quotes/latest?symbol=${baseTokenSymbol}&convert=${quoteTokenSymbol}`, {

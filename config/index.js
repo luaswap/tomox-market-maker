@@ -14,7 +14,7 @@ export const defaultOrderParams = {
   price: 1,
 }
 
-export const minimumPriceStepChange = utils.bigNumberify(10).pow(36).div(utils.bigNumberify(1e2)) // 0.01
+export const minimumPriceStepChange = utils.bigNumberify(10).pow(18).div(utils.bigNumberify(1e2)) // 0.01
 
 export const exchangeAddress = process.env.EX_COINBASE
 

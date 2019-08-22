@@ -45,7 +45,7 @@ const runMarketMaker = async () => {
 const handleEmptyOrderbook = async (side) => {
   try {
     const marketQuote = await getMarketQuotes()
-    const latestPrice = marketQuote['ETH'].quote['TOMO'].price
+    const latestPrice = marketQuote['BTC'].quote['TOMO'].price
     const newOrder = await prepareOrderParams(
       calculateBigNumberAmount(defaultOrderParams.amount).toString(),
       calculateCoinmarketcapPrice(side === 'BUY' ? latestPrice - 0.25 : latestPrice + 0.25),
@@ -62,7 +62,7 @@ const handleEmptyOrderbook = async (side) => {
 const applyLivePrice = async () => {
   try {
     const marketQuote = await getMarketQuotes()
-    const latestPrice = marketQuote['ETH'].quote['TOMO'].price
+    const latestPrice = marketQuote['BTC'].quote['TOMO'].price
     const newBidOrder = await prepareOrderParams(
       calculateBigNumberAmount(defaultOrderParams.amount).toString(),
       calculateCoinmarketcapPrice(latestPrice),
