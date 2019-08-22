@@ -6,9 +6,7 @@ import { printBigNumberToString } from './print'
 import { randInt } from "./helpers"
 
 export const calculateBigNumberAmount = amount => {
-  const amountMultiplier = utils.bigNumberify(10).pow(18)
-
-  return (new BigNumber(amount)).multipliedBy(amountMultiplier)
+  return (new BigNumber(amount)).multipliedBy(1e+18)
 }
 
 export const calculateCoinmarketcapPrice = price => {
@@ -21,7 +19,7 @@ export const calculateCoinmarketcapPrice = price => {
 }
 
 export const calculateBetterBid = (currentBestBid) => {
-  const defaultOrderAmount = calculateBigNumberAmount(defaultOrderParams.amount)
+  const defaultOrderAmount = calculateBigNumberAmount(defaultOrderParams.amount/(currentBestBid.pricepoint/1e+18))
 
   const newBidOrder = {
     amount: printBigNumberToString(defaultOrderAmount),
@@ -32,7 +30,7 @@ export const calculateBetterBid = (currentBestBid) => {
 }
 
 export const calculateBetterAsk = (currentBestAsk) => {
-  const defaultOrderAmount = calculateBigNumberAmount(defaultOrderParams.amount)
+  const defaultOrderAmount = calculateBigNumberAmount(defaultOrderParams.amount/(currentBestAsk.pricepoint/1e+18))
 
   const newAskOrder = {
     amount: printBigNumberToString(defaultOrderAmount),

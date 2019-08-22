@@ -25,14 +25,14 @@ const runMarketMaker = async () => {
       const bestBid = orderBookData.bids[0]
       let newBidOrder = calculateBetterBid(bestBid)
       newBidOrder = await prepareOrderParams(newBidOrder.amount, newBidOrder.price, 'BUY')
-      // console.log(newBidOrder)
+      console.log(newBidOrder)
 
       await createOrder(newBidOrder)
     } else {
       const bestAsk = orderBookData.asks[0]
       let newAskOrder = calculateBetterAsk(bestAsk)
       newAskOrder = await prepareOrderParams(newAskOrder.amount, newAskOrder.price, 'SELL')
-      // console.log(newAskOrder)
+      console.log(newAskOrder)
 
       await createOrder(newAskOrder)
     }
