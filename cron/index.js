@@ -13,7 +13,6 @@ const runMarketMaker = async () => {
       return
     }
 
-    console.log(orderBookData)
     if (orderBookData.bids.length === 0) {
       return await handleEmptyOrderbook('BUY')
     }
