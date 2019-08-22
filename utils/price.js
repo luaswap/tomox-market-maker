@@ -1,15 +1,14 @@
 import { utils } from 'ethers'
+import BigNumber from "bignumber.js"
 
 import { defaultOrderParams, minimumPriceStepChange } from '../config'
 import { printBigNumberToString } from './print'
 import { randInt } from "./helpers"
 
 export const calculateBigNumberAmount = amount => {
-  const randomNumber = randInt(amount, amount * 10)
-
   const amountMultiplier = utils.bigNumberify(10).pow(18)
 
-  return utils.bigNumberify(randomNumber).mul(amountMultiplier)
+  return (new BigNumber(amount)).multipliedBy(amountMultiplier)
 }
 
 export const calculateCoinmarketcapPrice = price => {
