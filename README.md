@@ -14,7 +14,7 @@ Please configure cron template to match your need.
 
 ## Usage
 
-At the moment, this market maker support only one pair ETH/TOMO on TomoX (for testing purpose)
+At the moment, this market maker support only one pair BTC/TOMO on TomoX (for testing purpose)
 
 ```
 npm start
