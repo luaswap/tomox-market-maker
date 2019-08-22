@@ -1,12 +1,14 @@
 import { utils } from 'ethers'
 import BigNumber from "bignumber.js"
 
+BigNumber.set({ ROUNDING_MODE: 0 })
+
 import { defaultOrderParams, minimumPriceStepChange } from '../config'
 import { printBigNumberToString } from './print'
 import { randInt } from "./helpers"
 
 export const calculateBigNumberAmount = amount => {
-  return (new BigNumber(amount)).multipliedBy(1e+18)
+  return (new BigNumber(amount)).multipliedBy(1e+18).toFixed(0) 
 }
 
 export const calculateCoinmarketcapPrice = price => {
