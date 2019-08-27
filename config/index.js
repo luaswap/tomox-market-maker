@@ -10,7 +10,7 @@ export const tokenAddresses = {
 }
 
 export const defaultOrderParams = {
-  amount: 100,
+  amount: 1000,
   price: 1,
 }
 

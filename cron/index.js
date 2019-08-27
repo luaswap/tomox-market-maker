@@ -40,6 +40,7 @@ const runMarketMaker = async () => {
   } catch (err) {
     console.log(err)
   }
+  process.exit(0)
 }
 
 const handleEmptyOrderbook = async (side) => {
@@ -79,10 +80,10 @@ const applyLivePrice = async () => {
 /**
  * Fetch order book
  */
-new CronJob(process.env.CRON_VALUE, runMarketMaker, null, true)
-// runMarketMaker()
+// new CronJob(process.env.CRON_VALUE, runMarketMaker, null, true)
+runMarketMaker()
 
 /**
  * Periodically (10 minutes) get real time price from coinmarketcap.com and create order
  */
-new CronJob(process.env.CRON_FETCH_LIVE_PRICE, applyLivePrice, null, true)
+// new CronJob(process.env.CRON_FETCH_LIVE_PRICE, applyLivePrice, null, true)

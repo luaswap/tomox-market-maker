@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "PORT=4000 nodemon --exec babel-node ./bin/www"
+    "start": "babel-node ./bin/cron"
   },
   "dependencies": {
     "axios": "^0.18.0",
