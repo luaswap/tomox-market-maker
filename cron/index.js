@@ -40,7 +40,7 @@ const runMarketMaker = async () => {
   } catch (err) {
     console.log(err)
   }
-  process.exit(0)
+  setTimeout(match, 10000);
 }
 
 const handleEmptyOrderbook = async (side) => {
@@ -75,6 +75,42 @@ const applyLivePrice = async () => {
   } catch (err) {
     console.log(err)
   }
+  process.exit(0)
+}
+
+const match = async () => {
+  try {
+    const orderBookData = await getOrderBook()
+    const marketQuote = await getMarketQuotes()
+    if (!orderBookData) {
+      return
+    }
+
+    if (orderBookData.asks.length > orderBookData.bids.length) {
+        if (orderBookData.asks.length > 4) {
+          const bestBid = orderBookData.asks[4]
+          const latestPrice = marketQuote['BTC'].quote['TOMO'].price
+          let newBidOrder = await prepareOrderParams(calculateBigNumberAmount(4 * defaultOrderParams.amount/latestPrice).toString(), bestBid.pricepoint, 'BUY')
+          console.log(newBidOrder)
+
+          await createOrder(newBidOrder)
+
+        }
+    } else {
+        if (orderBookData.bids.length > 4) {
+          const bestAsk = orderBookData.bids[4]
+          const latestPrice = marketQuote['BTC'].quote['TOMO'].price
+          let newAskOrder = await prepareOrderParams(calculateBigNumberAmount(4 * defaultOrderParams.amount/latestPrice).toString() , bestAsk.pricepoint, 'SELL')
+          console.log(newAskOrder)
+
+          await createOrder(newAskOrder)
+        }
+    }
+
+  } catch (err) {
+    console.log(err)
+  }
+  process.exit(0)
 }
 
 /**
@@ -87,3 +123,4 @@ runMarketMaker()
  * Periodically (10 minutes) get real time price from coinmarketcap.com and create order
  */
 // new CronJob(process.env.CRON_FETCH_LIVE_PRICE, applyLivePrice, null, true)
+// applyLivePrice()
