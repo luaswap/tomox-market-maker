@@ -82,6 +82,10 @@ const match = async () => {
   try {
     const orderBookData = await getOrderBook()
     const marketQuote = await getMarketQuotes()
+    if (!orderBookData) {
+      process.exit(0)
+      return
+    }
 
     if (orderBookData.asks.length > orderBookData.bids.length) {
         if (orderBookData.asks.length > 4) {
