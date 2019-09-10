@@ -58,6 +58,7 @@ const handleEmptyOrderbook = async (side) => {
   } catch (err) {
     console.log(err)
   }
+  process.exit(0)
 }
 
 const applyLivePrice = async () => {
