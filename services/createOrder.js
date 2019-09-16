@@ -8,11 +8,6 @@ export const prepareOrderParams = async (amount, price, side) => {
   const userAddress = await signer.getAddress()
   const pair = await getPair()
 
-  const {
-    makeFee,
-    takeFee,
-  } = pair
-
   const params = {
     side,
     exchangeAddress,
@@ -20,8 +15,6 @@ export const prepareOrderParams = async (amount, price, side) => {
     pair,
     amount,
     price,
-    makeFee,
-    takeFee,
   }
 
   const order = await createRawOrder(params)

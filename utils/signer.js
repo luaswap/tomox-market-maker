@@ -25,7 +25,7 @@ export const createLocalWalletSigner = async () => {
 export const createRawOrder = async (params) => {
   try {
     const order = {}
-    const { userAddress, exchangeAddress, side, pair, amount, price, makeFee, takeFee } = params
+    const { userAddress, exchangeAddress, side, pair, amount, price } = params
     const { baseTokenAddress, quoteTokenAddress, baseTokenDecimals, quoteTokenDecimals } = pair
 
 
@@ -43,8 +43,6 @@ export const createRawOrder = async (params) => {
     order.amount = amount
     order.pricepoint = price
     order.side = side
-    order.makeFee = makeFee
-    order.takeFee = takeFee
     order.nonce = await getNonce()
     order.hash = getOrderHash(order)
 

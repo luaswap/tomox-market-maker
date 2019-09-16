@@ -13,8 +13,6 @@ export const getOrderHash = order => {
       'uint256',
       'uint256',
       'uint256',
-      'uint256',
-      'uint256',
     ],
     [
       order.exchangeAddress,
@@ -25,8 +23,6 @@ export const getOrderHash = order => {
       order.pricepoint,
       order.side === 'BUY' ? '0' : '1',
       order.nonce,
-      order.makeFee,
-      order.takeFee,
     ],
   )
 }
@@ -34,10 +30,9 @@ export const getOrderHash = order => {
 export const getNonce = async () => {
   let nonce = 0
   try {
-      const response = await axios.get(`${process.env.BASE_URL}/orders/count?address=${process.env.MARKET_MAKER_ADDRESS}`)
-      // nonce = response.data.data ? String(response.data.data + 1) : '0'
+      const response = await axios.get(`${process.env.BASE_URL}/orders/nonce?address=${process.env.MARKET_MAKER_ADDRESS}`)
       console.log(response.data)
-      nonce = response.data.data + 1
+      nonce = response.data.data ? String(response.data.data + 1) : '0'
   } catch (e) {
       console.log(e)
       nonce = 0
