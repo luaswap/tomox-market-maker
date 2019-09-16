@@ -32,7 +32,7 @@ export const getNonce = async () => {
   try {
       const response = await axios.get(`${process.env.BASE_URL}/orders/nonce?address=${process.env.MARKET_MAKER_ADDRESS}`)
       console.log(response.data)
-      nonce = response.data.data ? String(response.data.data + 1) : '0'
+      nonce = String(response.data.data + 1)
   } catch (e) {
       console.log(e)
       nonce = 0
