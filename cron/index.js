@@ -2,7 +2,7 @@ const CronJob = require('cron').CronJob
 
 import { getOrderBook } from '../services/getOrderBook'
 import { prepareOrderParams, createOrder } from '../services/createOrder'
-import { getMarketQuotes } from "../services/coinmarketcap/getMarketQuotes"
+import { getLatestPrice } from "../services/coingecko"
 import { calculateBetterBid, calculateBetterAsk, calculateBigNumberAmount, calculateCoinmarketcapPrice } from '../utils/price'
 import { defaultOrderParams } from '../config'
 
@@ -45,8 +45,7 @@ const runMarketMaker = async () => {
 
 const handleEmptyOrderbook = async (side) => {
   try {
-    const marketQuote = await getMarketQuotes()
-    const latestPrice = marketQuote['BTC'].quote['TOMO'].price
+    const latestPrice = await getLatestPrice()
     const newOrder = await prepareOrderParams(
       calculateBigNumberAmount(defaultOrderParams.amount/latestPrice).toString(),
       calculateCoinmarketcapPrice(side === 'BUY' ? latestPrice - 0.25 : latestPrice + 0.25),
@@ -63,8 +62,7 @@ const handleEmptyOrderbook = async (side) => {
 
 const applyLivePrice = async () => {
   try {
-    const marketQuote = await getMarketQuotes()
-    const latestPrice = marketQuote['BTC'].quote['TOMO'].price
+    const latestPrice = getLatestPrice()
     const newBidOrder = await prepareOrderParams(
       calculateBigNumberAmount(defaultOrderParams.amount/latestPrice).toString(),
       calculateCoinmarketcapPrice(latestPrice),
@@ -82,7 +80,6 @@ const applyLivePrice = async () => {
 const match = async () => {
   try {
     const orderBookData = await getOrderBook()
-    const marketQuote = await getMarketQuotes()
     if (!orderBookData) {
       process.exit(0)
       return
@@ -91,7 +88,7 @@ const match = async () => {
     if (orderBookData.asks.length > orderBookData.bids.length) {
         if (orderBookData.asks.length > 4) {
           const bestBid = orderBookData.asks[4]
-          const latestPrice = marketQuote['BTC'].quote['TOMO'].price
+          const latestPrice = await getLatestPrice()
           let newBidOrder = await prepareOrderParams(calculateBigNumberAmount(4 * defaultOrderParams.amount/latestPrice).toString(), bestBid.pricepoint, 'BUY')
           console.log(newBidOrder)
 
@@ -101,7 +98,7 @@ const match = async () => {
     } else {
         if (orderBookData.bids.length > 4) {
           const bestAsk = orderBookData.bids[4]
-          const latestPrice = marketQuote['BTC'].quote['TOMO'].price
+          const latestPrice = await getLatestPrice()
           let newAskOrder = await prepareOrderParams(calculateBigNumberAmount(4 * defaultOrderParams.amount/latestPrice).toString() , bestAsk.pricepoint, 'SELL')
           console.log(newAskOrder)
 
