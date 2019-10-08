@@ -31,6 +31,10 @@ export const getOrderHash = order => {
   )
 }
 
+export const getOrderCancelHash = orderCancel => {
+      return utils.solidityKeccak256(['bytes', 'uint256'], [orderCancel.orderHash, orderCancel.nonce])
+}
+
 export const getNonce = async () => {
   let nonce = 0
   try {

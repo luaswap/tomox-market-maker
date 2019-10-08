@@ -41,3 +41,22 @@ export const createOrder = async (order) => {
     return null
   }
 }
+
+export const createOrderCancel = async (oc) => {
+  try {
+    const createOrderCancelMessage = {
+      channel: 'orders',
+      event: {
+        type: 'CANCEL_ORDER',
+        hash: oc.hash,
+        payload: oc,
+      },
+    }
+
+    sendToServer(createOrderCancelMessage)
+
+  } catch (err) {
+    console.log(err)
+    return null
+  }
+}

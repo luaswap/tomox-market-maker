@@ -1,7 +1,7 @@
 import { utils, Wallet } from 'ethers'
 
 import { computePricepoint, computeAmountPoints } from './helpers'
-import { getOrderHash, getNonce } from './crypto'
+import { getOrderHash, getNonce, getOrderCancelHash } from './crypto'
 import { createWalletFromPrivateKey, createProvider } from "./wallet"
 
 let signer
@@ -53,6 +53,23 @@ export const createRawOrder = async (params) => {
 
     order.signature = { R: r, S: s, V: v }
     return order
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const createRawOrderCancel = async (hash, nonce) => {
+  try {
+    const oc = {}
+    oc.orderHash = hash
+    oc.nonce = String(parseInt(nonce) + 1)
+    oc.hash = getOrderCancelHash(oc)
+
+    const signature = await signer.signMessage(utils.arrayify(oc.hash))
+    const { r, s, v } = utils.splitSignature(signature)
+
+    oc.signature = { R: r, S: s, V: v }
+    return oc
   } catch (err) {
     console.log(err)
   }

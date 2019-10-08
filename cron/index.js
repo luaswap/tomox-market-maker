@@ -1,12 +1,15 @@
 const CronJob = require('cron').CronJob
 
 import { getOrderBook } from '../services/getOrderBook'
-import { prepareOrderParams, createOrder } from '../services/createOrder'
+import { prepareOrderParams, createOrder, createOrderCancel } from '../services/createOrder'
 import { getLatestPrice } from "../services/coingecko"
 import { calculateBetterBid, calculateBetterAsk, calculateBigNumberAmount, calculateCoinmarketcapPrice } from '../utils/price'
+import { createRawOrderCancel } from '../utils/signer'
 import { defaultOrderParams } from '../config'
 
 const runMarketMaker = async () => {
+  let hash = false
+  let nonce = 0
   try {
     const orderBookData = await getOrderBook()
     if (!orderBookData) {
@@ -26,6 +29,9 @@ const runMarketMaker = async () => {
       let newBidOrder = calculateBetterBid(bestBid)
       newBidOrder = await prepareOrderParams(newBidOrder.amount, newBidOrder.price, 'BUY')
       console.log(newBidOrder)
+      hash = newBidOrder.hash
+      nonce = newBidOrder.nonce
+
 
       await createOrder(newBidOrder)
     } else {
@@ -33,12 +39,17 @@ const runMarketMaker = async () => {
       let newAskOrder = calculateBetterAsk(bestAsk)
       newAskOrder = await prepareOrderParams(newAskOrder.amount, newAskOrder.price, 'SELL')
       console.log(newAskOrder)
+      hash = newAskOrder.hash
+      nonce = newAskOrder.nonce
 
       await createOrder(newAskOrder)
     }
 
   } catch (err) {
     console.log(err)
+  }
+  if (Math.floor(Math.random() * 5) == 2 && hash) {
+      await cancel(hash, nonce)
   }
   setTimeout(match, 10000);
 }
@@ -75,6 +86,13 @@ const applyLivePrice = async () => {
     console.log(err)
   }
   process.exit(0)
+}
+
+const cancel = async (hash, nonce) => {
+    console.log('Cancel order', hash)
+    const oc = await createRawOrderCancel(hash, nonce)
+    console.log(oc)
+    await createOrderCancel(oc)
 }
 
 const match = async () => {
@@ -118,8 +136,3 @@ const match = async () => {
 // new CronJob(process.env.CRON_VALUE, runMarketMaker, null, true)
 runMarketMaker()
 
-/**
- * Periodically (10 minutes) get real time price from coinmarketcap.com and create order
- */
-// new CronJob(process.env.CRON_FETCH_LIVE_PRICE, applyLivePrice, null, true)
-// applyLivePrice()
