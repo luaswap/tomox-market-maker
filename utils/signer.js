@@ -43,6 +43,8 @@ export const createRawOrder = async (params) => {
     order.amount = amount
     order.pricepoint = price
     order.side = side
+    order.type = 'LO'
+    order.status = 'NEW'
     order.nonce = await getNonce()
     order.hash = getOrderHash(order)
 

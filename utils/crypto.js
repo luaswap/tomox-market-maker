@@ -12,6 +12,8 @@ export const getOrderHash = order => {
       'uint256',
       'uint256',
       'uint256',
+      'string',
+      'string',
       'uint256',
     ],
     [
@@ -22,6 +24,8 @@ export const getOrderHash = order => {
       order.amount,
       order.pricepoint,
       order.side === 'BUY' ? '0' : '1',
+      order.status,
+      order.type,
       order.nonce,
     ],
   )
@@ -32,7 +36,7 @@ export const getNonce = async () => {
   try {
       const response = await axios.get(`${process.env.BASE_URL}/orders/nonce?address=${process.env.MARKET_MAKER_ADDRESS}`)
       console.log(response.data)
-      nonce = String(response.data.data + 1)
+      nonce = String(response.data.data)
   } catch (e) {
       console.log(e)
       nonce = 0
