@@ -1,11 +1,12 @@
 import { getOrderBook } from './services/getOrderBook'
 import { getLatestPrice } from "./services/coingecko"
-import { calculateBetterBid, calculateBetterAsk, calculateBigNumberAmount, calculateCoinmarketcapPrice } from './utils/price'
 require('dotenv').config()
 import TomoX from 'tomoxjs'
+import BigNumber from "bignumber.js"
 
 const tomox = new TomoX(process.env.RELAYER_URL, process.env.MARKET_MAKER_PRIVATE_KEY)
-const defaultAmount = 1000
+const defaultAmount = 1000 // TOMO
+const minimumPriceStepChange = 0.01
 
 const runMarketMaker = async () => {
     let hash = false
@@ -30,8 +31,8 @@ const runMarketMaker = async () => {
             let o = await tomox.createOrder({
                 baseToken: process.env.BTC_ADDRESS,
                 quoteToken: process.env.TOMO_ADDRESS,
-                price: newBidOrder.price / 10 ** 18,
-                amount: newBidOrder.amount / 10 ** 18,
+                price: newBidOrder.price,
+                amount: newBidOrder.amount,
                 side: 'BUY'
             })
             hash = o.hash
@@ -43,8 +44,8 @@ const runMarketMaker = async () => {
             let o = await tomox.createOrder({
                 baseToken: process.env.BTC_ADDRESS,
                 quoteToken: process.env.TOMO_ADDRESS,
-                price: newAskOrder.price / 10 ** 18,
-                amount: newAskOrder.amount / 10 ** 18,
+                price: newAskOrder.price,
+                amount: newAskOrder.amount,
                 side: 'SELL'
             })
             hash = o.hash
@@ -64,8 +65,8 @@ const runMarketMaker = async () => {
 const handleEmptyOrderbook = async (side) => {
     try {
         const latestPrice = await getLatestPrice()
-        let amount = calculateBigNumberAmount(defaultAmount/latestPrice).toString() / 10 ** 18
-        let price = calculateCoinmarketcapPrice(side === 'BUY' ? latestPrice - 0.25 : latestPrice + 0.25) / 10 ** 18
+        let amount = (defaultAmount/latestPrice).toString()
+        let price = side === 'BUY' ? latestPrice - 0.1 * latestPrice : latestPrice + 0.1 * latestPrice
         let o = await tomox.createOrder({
             baseToken: process.env.BTC_ADDRESS,
             quoteToken: process.env.TOMO_ADDRESS,
@@ -80,30 +81,10 @@ const handleEmptyOrderbook = async (side) => {
     process.exit(0)
 }
 
-const applyLivePrice = async () => {
-    try {
-        const latestPrice = getLatestPrice()
-        let amount = calculateBigNumberAmount(defaultAmount/latestPrice).toString() / 10 ** 18
-        let price = calculateCoinmarketcapPrice(latestPrice) / 10 ** 18
-        let side = 'BUY'
-
-        let o = await tomox.createOrder({
-            baseToken: process.env.BTC_ADDRESS,
-            quoteToken: process.env.TOMO_ADDRESS,
-            price: price,
-            amount: amount,
-            side: side 
-        })
-        console.log(o)
-    } catch (err) {
-        console.log(err)
-    }
-    process.exit(0)
-}
-
 const cancel = async (hash, nonce) => {
     console.log('Cancel order', hash)
     const oc = await tomox.cancelOrder(hash, nonce)
+    console.log(oc)
 }
 
 const match = async () => {
@@ -118,8 +99,8 @@ const match = async () => {
             if (orderBookData.asks.length > 4) {
                 const bestBid = orderBookData.asks[4]
                 const latestPrice = await getLatestPrice()
-                let amount = calculateBigNumberAmount(4 * defaultAmount/latestPrice).toString() / 10 ** 18
-                let price = bestBid.pricepoint / 10 ** 18
+                let amount = (4 * defaultAmount/latestPrice).toString()
+                let price = bestBid.pricepoint
                 let side = 'BUY'
                 let o = await tomox.createOrder({
                     baseToken: process.env.BTC_ADDRESS,
@@ -135,8 +116,8 @@ const match = async () => {
             if (orderBookData.bids.length > 4) {
                 const bestAsk = orderBookData.bids[4]
                 const latestPrice = await getLatestPrice()
-                let amount = calculateBigNumberAmount(4 * defaultAmount/latestPrice).toString() / 10 ** 18
-                let price = bestAsk.pricepoint / 10 ** 18
+                let amount = (4 * defaultAmount/latestPrice).toString()
+                let price = bestAsk.pricepoint
                 let side = 'SELL'
 
                 // await createOrder(newAskOrder)
@@ -155,6 +136,25 @@ const match = async () => {
         console.log(err)
     }
     process.exit(0)
+}
+
+
+const calculateBetterBid = (currentBestBid) => {
+  const newBidOrder = {
+    amount: defaultAmount/(currentBestBid.pricepoint/1e+18),
+    price: (new BigNumber(currentBestBid.pricepoint/1e+18).plus(minimumPriceStepChange)).toString()
+  }
+
+  return newBidOrder
+}
+
+const calculateBetterAsk = (currentBestAsk) => {
+  const newAskOrder = {
+    amount: defaultAmount/(currentBestAsk.pricepoint/1e+18),
+    price: (new BigNumber(currentBestAsk.pricepoint/1e+18).sub(minimumPriceStepChange)).toString()
+  }
+
+  return newAskOrder
 }
 
 /**
