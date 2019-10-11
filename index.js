@@ -1,8 +1,8 @@
-import { getOrderBook } from './services/getOrderBook'
-import { getLatestPrice } from "./services/coingecko"
+const { getOrderBook } = require('./services/getOrderBook')
+const { getLatestPrice } = require("./services/coingecko")
 require('dotenv').config()
-import TomoX from 'tomoxjs'
-import BigNumber from "bignumber.js"
+const TomoX = require('tomoxjs')
+const BigNumber = require("bignumber.js")
 
 const tomox = new TomoX(process.env.RELAYER_URL, process.env.MARKET_MAKER_PRIVATE_KEY)
 const defaultAmount = 1000 // TOMO
@@ -140,21 +140,21 @@ const match = async () => {
 
 
 const calculateBetterBid = (currentBestBid) => {
-  const newBidOrder = {
-    amount: defaultAmount/(currentBestBid.pricepoint/1e+18),
-    price: (new BigNumber(currentBestBid.pricepoint/1e+18).plus(minimumPriceStepChange)).toString()
-  }
+    const newBidOrder = {
+        amount: defaultAmount/(currentBestBid.pricepoint/1e+18),
+        price: (new BigNumber(currentBestBid.pricepoint/1e+18).plus(minimumPriceStepChange)).toString()
+    }
 
-  return newBidOrder
+    return newBidOrder
 }
 
 const calculateBetterAsk = (currentBestAsk) => {
-  const newAskOrder = {
-    amount: defaultAmount/(currentBestAsk.pricepoint/1e+18),
-    price: (new BigNumber(currentBestAsk.pricepoint/1e+18).sub(minimumPriceStepChange)).toString()
-  }
+    const newAskOrder = {
+        amount: defaultAmount/(currentBestAsk.pricepoint/1e+18),
+        price: (new BigNumber(currentBestAsk.pricepoint/1e+18).sub(minimumPriceStepChange)).toString()
+    }
 
-  return newAskOrder
+    return newAskOrder
 }
 
 /**

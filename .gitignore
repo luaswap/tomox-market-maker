@@ -1,4 +1,5 @@
 .env
+.eslintcache
 node_modules/
 *.sw*
 *.log
