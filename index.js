@@ -6,7 +6,7 @@ const BigNumber = require("bignumber.js")
 
 const tomox = new TomoX(process.env.RELAYER_URL, process.env.MARKET_MAKER_PRIVATE_KEY)
 const defaultAmount = 1000 // TOMO
-const minimumPriceStepChange = 0.01
+const minimumPriceStepChange = 1 // TOMO
 
 const runMarketMaker = async () => {
     let hash = false
@@ -66,7 +66,7 @@ const handleEmptyOrderbook = async (side) => {
     try {
         const latestPrice = await getLatestPrice()
         let amount = (defaultAmount/latestPrice).toString()
-        let price = side === 'BUY' ? latestPrice - 0.1 * latestPrice : latestPrice + 0.1 * latestPrice
+        let price = side === 'BUY' ? latestPrice - 0.01 * latestPrice : latestPrice + 0.01 * latestPrice
         let o = await tomox.createOrder({
             baseToken: process.env.BTC_ADDRESS,
             quoteToken: process.env.TOMO_ADDRESS,
@@ -82,7 +82,6 @@ const handleEmptyOrderbook = async (side) => {
 }
 
 const cancel = async (hash, nonce) => {
-    console.log('Cancel order', hash)
     const oc = await tomox.cancelOrder(hash, nonce)
     console.log('CANCEL BTC/TOMO', hash)
 }
@@ -109,7 +108,7 @@ const match = async () => {
                     amount: amount,
                     side: side
                 })
-                console.log('BUY BTC/TOMO', price, amount)
+                console.log('BUY BTC/TOMO', price, amount, 'MATCHED')
 
             }
         } else {
@@ -128,7 +127,7 @@ const match = async () => {
                     amount: amount,
                     side: side
                 })
-                console.log('SELL BTC/TOMO', price, amount)
+                console.log('SELL BTC/TOMO', price, amount, 'MATCHED')
             }
         }
 
