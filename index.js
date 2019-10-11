@@ -27,30 +27,30 @@ const runMarketMaker = async () => {
 
         if (orderBookData.bids.length <= orderBookData.asks.length) {
             const bestBid = orderBookData.bids[0]
-            let newBidOrder = calculateBetterBid(bestBid)
+            let { price, amount } = calculateBetterBid(bestBid)
             let o = await tomox.createOrder({
                 baseToken: process.env.BTC_ADDRESS,
                 quoteToken: process.env.TOMO_ADDRESS,
-                price: newBidOrder.price,
-                amount: newBidOrder.amount,
+                price: price,
+                amount: amount,
                 side: 'BUY'
             })
             hash = o.hash
             nonce = parseInt(o.nonce) + 1
-            console.log(o)
+            console.log('BUY BTC/TOMO', price, amount)
         } else {
             const bestAsk = orderBookData.asks[0]
-            let newAskOrder = calculateBetterAsk(bestAsk)
+            let { price, amount }= calculateBetterAsk(bestAsk)
             let o = await tomox.createOrder({
                 baseToken: process.env.BTC_ADDRESS,
                 quoteToken: process.env.TOMO_ADDRESS,
-                price: newAskOrder.price,
-                amount: newAskOrder.amount,
+                price: price,
+                amount: amount,
                 side: 'SELL'
             })
             hash = o.hash
             nonce = parseInt(o.nonce) + 1
-            console.log(o)
+            console.log('SEL BTC/TOMO', price, amount)
         }
 
     } catch (err) {
@@ -66,7 +66,8 @@ const handleEmptyOrderbook = async (side) => {
     try {
         const latestPrice = await getLatestPrice()
         let amount = (defaultAmount/latestPrice).toString()
-        let price = side === 'BUY' ? latestPrice - 0.1 * latestPrice : latestPrice + 0.1 * latestPrice
+        let price = side === 'BUY' ? latestPrice - 0.1 * latestPrice : latestPrice + 0.1 * latestPrice 
+        price = price / 10 ** 18
         let o = await tomox.createOrder({
             baseToken: process.env.BTC_ADDRESS,
             quoteToken: process.env.TOMO_ADDRESS,
@@ -74,7 +75,7 @@ const handleEmptyOrderbook = async (side) => {
             amount: amount,
             side: side
         })
-        console.log(o)
+        console.log('BUY BTC/TOMO', price, amount)
     } catch (err) {
         console.log(err)
     }
@@ -84,7 +85,7 @@ const handleEmptyOrderbook = async (side) => {
 const cancel = async (hash, nonce) => {
     console.log('Cancel order', hash)
     const oc = await tomox.cancelOrder(hash, nonce)
-    console.log(oc)
+    console.log('CANCEL BTC/TOMO', hash)
 }
 
 const match = async () => {
@@ -109,8 +110,7 @@ const match = async () => {
                     amount: amount,
                     side: side
                 })
-                console.log('BUY', amount, price)
-                console.log(o)
+                console.log('BUY BTC/TOMO', price, amount)
 
             }
         } else {
@@ -120,7 +120,6 @@ const match = async () => {
                 let amount = (4 * defaultAmount/latestPrice).toString()
                 let price = bestAsk.pricepoint / 10 ** 18
                 let side = 'SELL'
-                console.log('SELL', amount, price)
 
                 // await createOrder(newAskOrder)
                 let o = await tomox.createOrder({
@@ -130,7 +129,7 @@ const match = async () => {
                     amount: amount,
                     side: side
                 })
-                console.log(o)
+                console.log('SELL BTC/TOMO', price, amount)
             }
         }
 
