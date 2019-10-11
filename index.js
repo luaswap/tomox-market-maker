@@ -66,8 +66,7 @@ const handleEmptyOrderbook = async (side) => {
     try {
         const latestPrice = await getLatestPrice()
         let amount = (defaultAmount/latestPrice).toString()
-        let price = side === 'BUY' ? latestPrice - 0.1 * latestPrice : latestPrice + 0.1 * latestPrice 
-        price = price / 10 ** 18
+        let price = side === 'BUY' ? latestPrice - 0.1 * latestPrice : latestPrice + 0.1 * latestPrice
         let o = await tomox.createOrder({
             baseToken: process.env.BTC_ADDRESS,
             quoteToken: process.env.TOMO_ADDRESS,
