@@ -37,7 +37,7 @@ const runMarketMaker = async () => {
             })
             hash = o.hash
             nonce = parseInt(o.nonce) + 1
-            console.log('BUY BTC/TOMO', price, amount)
+            console.log('BUY BTC/TOMO', price, amount, o.nonce)
         } else {
             const bestAsk = orderBookData.asks[0]
             let { price, amount }= calculateBetterAsk(bestAsk)
@@ -50,7 +50,7 @@ const runMarketMaker = async () => {
             })
             hash = o.hash
             nonce = parseInt(o.nonce) + 1
-            console.log('SEL BTC/TOMO', price, amount)
+            console.log('SEL BTC/TOMO', price, amount, o.nonce)
         }
 
     } catch (err) {
@@ -74,7 +74,7 @@ const handleEmptyOrderbook = async (side) => {
             amount: amount,
             side: side
         })
-        console.log('BUY BTC/TOMO', price, amount)
+        console.log('BUY BTC/TOMO', price, amount, o.nonce)
     } catch (err) {
         console.log(err)
     }
@@ -83,7 +83,7 @@ const handleEmptyOrderbook = async (side) => {
 
 const cancel = async (hash, nonce) => {
     const oc = await tomox.cancelOrder(hash, nonce)
-    console.log('CANCEL BTC/TOMO', hash)
+    console.log('CANCEL BTC/TOMO', hash, nonce)
 }
 
 const match = async () => {
@@ -108,7 +108,7 @@ const match = async () => {
                     amount: amount,
                     side: side
                 })
-                console.log('BUY BTC/TOMO', price, amount, 'MATCHED')
+                console.log('BUY BTC/TOMO', price, amount, o.nonce, 'MATCHED')
 
             }
         } else {
@@ -127,7 +127,7 @@ const match = async () => {
                     amount: amount,
                     side: side
                 })
-                console.log('SELL BTC/TOMO', price, amount, 'MATCHED')
+                console.log('SELL BTC/TOMO', price, amount, o.nonce, 'MATCHED')
             }
         }
 
