@@ -20,6 +20,12 @@ At the moment, this market maker support only one pair BTC/TOMO on TomoX (for te
 npm start
 ```
 
+## Run Bot
+```
+pm2 start npm --cron "*/1 * * * *" --name bot -- start
+
+```
+
 ## Contribution
 
 Please try your best to follow the guidance here:

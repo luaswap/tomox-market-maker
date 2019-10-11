@@ -1,10 +1,10 @@
-import { getOrderBook } from '../services/getOrderBook'
-import { getLatestPrice } from "../services/coingecko"
-import { calculateBetterBid, calculateBetterAsk, calculateBigNumberAmount, calculateCoinmarketcapPrice } from '../utils/price'
+import { getOrderBook } from './services/getOrderBook'
+import { getLatestPrice } from "./services/coingecko"
+import { calculateBetterBid, calculateBetterAsk, calculateBigNumberAmount, calculateCoinmarketcapPrice } from './utils/price'
+require('dotenv').config()
 import TomoX from 'tomoxjs'
 
 const tomox = new TomoX(process.env.RELAYER_URL, process.env.MARKET_MAKER_PRIVATE_KEY)
-console.log(tomox.coinbase)
 const defaultAmount = 1000
 
 const runMarketMaker = async () => {
@@ -34,6 +34,8 @@ const runMarketMaker = async () => {
                 amount: newBidOrder.amount / 10 ** 18,
                 side: 'BUY'
             })
+            hash = o.hash
+            nonce = parseInt(o.nonce) + 1
             console.log(o)
         } else {
             const bestAsk = orderBookData.asks[0]
@@ -45,6 +47,8 @@ const runMarketMaker = async () => {
                 amount: newAskOrder.amount / 10 ** 18,
                 side: 'SELL'
             })
+            hash = o.hash
+            nonce = parseInt(o.nonce) + 1
             console.log(o)
         }
 
@@ -62,7 +66,6 @@ const handleEmptyOrderbook = async (side) => {
         const latestPrice = await getLatestPrice()
         let amount = calculateBigNumberAmount(defaultAmount/latestPrice).toString() / 10 ** 18
         let price = calculateCoinmarketcapPrice(side === 'BUY' ? latestPrice - 0.25 : latestPrice + 0.25) / 10 ** 18
-        let side = 'BUY'
         let o = await tomox.createOrder({
             baseToken: process.env.BTC_ADDRESS,
             quoteToken: process.env.TOMO_ADDRESS,
@@ -100,12 +103,12 @@ const applyLivePrice = async () => {
 
 const cancel = async (hash, nonce) => {
     console.log('Cancel order', hash)
-    const oc = await tomox.cancelOrder(hash)
+    const oc = await tomox.cancelOrder(hash, nonce)
 }
 
 const match = async () => {
     try {
-        const orderBookData = await getOrderBook()
+        const orderBookData = await getOrderBook(process.env.BTC_ADDRESS, process.env.TOMO_ADDRESS)
         if (!orderBookData) {
             process.exit(0)
             return

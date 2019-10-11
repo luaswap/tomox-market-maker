@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "babel-node ./bin/cron"
+    "start": "babel-node index.js"
   },
   "dependencies": {
     "axios": "^0.18.0",
