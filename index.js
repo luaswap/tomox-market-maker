@@ -100,7 +100,7 @@ const match = async () => {
                 const bestBid = orderBookData.asks[4]
                 const latestPrice = await getLatestPrice()
                 let amount = (4 * defaultAmount/latestPrice).toString()
-                let price = bestBid.pricepoint
+                let price = bestBid.pricepoint / 10 ** 18
                 let side = 'BUY'
                 let o = await tomox.createOrder({
                     baseToken: process.env.BTC_ADDRESS,
@@ -109,6 +109,7 @@ const match = async () => {
                     amount: amount,
                     side: side
                 })
+                console.log('BUY', amount, price)
                 console.log(o)
 
             }
@@ -117,8 +118,9 @@ const match = async () => {
                 const bestAsk = orderBookData.bids[4]
                 const latestPrice = await getLatestPrice()
                 let amount = (4 * defaultAmount/latestPrice).toString()
-                let price = bestAsk.pricepoint
+                let price = bestAsk.pricepoint / 10 ** 18
                 let side = 'SELL'
+                console.log('SELL', amount, price)
 
                 // await createOrder(newAskOrder)
                 let o = await tomox.createOrder({
@@ -151,7 +153,7 @@ const calculateBetterBid = (currentBestBid) => {
 const calculateBetterAsk = (currentBestAsk) => {
     const newAskOrder = {
         amount: defaultAmount/(currentBestAsk.pricepoint/1e+18),
-        price: (new BigNumber(currentBestAsk.pricepoint/1e+18).sub(minimumPriceStepChange)).toString()
+        price: (new BigNumber(currentBestAsk.pricepoint/1e+18).minus(minimumPriceStepChange)).toString()
     }
 
     return newAskOrder

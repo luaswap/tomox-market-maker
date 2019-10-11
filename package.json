@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "babel-node index.js",
+    "start": "node index.js",
     "lint": "eslint --cache ./ --ext .js"
   },
   "dependencies": {
