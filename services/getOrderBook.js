@@ -1,13 +1,11 @@
 import axios from 'axios'
 
-import { BASE_URL, tokenAddresses } from '../config'
-
 export const getOrderBook = async (baseToken = null, quoteToken = null) => {
   try {
-    baseToken = baseToken || tokenAddresses.BTC
-    quoteToken = quoteToken || tokenAddresses.TOMO
+    baseToken = baseToken || process.env.BTC_ADDRESS
+    quoteToken = quoteToken || process.env.TOMO_ADDRESS
 
-    const response = await axios.get(`${BASE_URL}/orderbook?baseToken=${baseToken}&quoteToken=${quoteToken}`)
+    const response = await axios.get(`${process.env.RELAYER_URL}/api/orderbook?baseToken=${baseToken}&quoteToken=${quoteToken}`)
 
     return response.data.data
   } catch (err) {
