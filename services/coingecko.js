@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import { coinMarketCapAPI } from "../config"
-
 export const getLatestPrice = async () => {
   try {
     console.log('Fetch data from coingecko')
