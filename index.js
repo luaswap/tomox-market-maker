@@ -7,8 +7,9 @@ const BigNumber = require("bignumber.js")
 const tomox = new TomoX(process.env.RELAYER_URL, process.env.MARKET_MAKER_PRIVATE_KEY)
 const defaultAmount = 10000 // TOMO
 const minimumPriceStepChange = 1 // TOMO
-const FIXA = 1
-const FIXP = 0
+const FIXA = 1 // amount decimals
+const FIXP = 0 // price decimals
+const ORDERBOOK_LENGTH = 10 // number of order in orderbook
 
 const runMarketMaker = async () => {
     let hash = false
@@ -68,7 +69,7 @@ const handleEmptyOrderbook = async (side) => {
     try {
         const latestPrice = await getLatestPrice()
         let amount = (defaultAmount/latestPrice).toFixed(FIXA).toString()
-        let price = (side === 'BUY' ? latestPrice - 0.0001 * latestPrice : latestPrice + 0.0001 * latestPrice).toFixed(FIXP)
+        let price = (side === 'BUY' ? latestPrice - ORDERBOOK_LENGTH * minimumPriceStepChange : latestPrice + ORDERBOOK_LENGTH * minimumPriceStepChange).toFixed(FIXP)
         let o = await tomox.createOrder({
             baseToken: process.env.BTC_ADDRESS,
             quoteToken: process.env.TOMO_ADDRESS,
@@ -90,17 +91,18 @@ const cancel = async (hash, nonce) => {
 
 const match = async () => {
     try {
+        let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
         const orderBookData = await getOrderBook(process.env.BTC_ADDRESS, process.env.TOMO_ADDRESS)
         if (!orderBookData) {
             process.exit(0)
             return
         }
 
-        if (orderBookData.asks.length > orderBookData.bids.length) {
-            if (orderBookData.asks.length > 4) {
-                const bestBid = orderBookData.asks[4]
+        if (orderBookData.asks.length >= orderBookData.bids.length) {
+            if (orderBookData.asks.length >= ORDERBOOK_LENGTH) {
+                const bestBid = orderBookData.asks[ORDERBOOK_LENGTH - 1]
                 const latestPrice = await getLatestPrice()
-                let amount = (4 * defaultAmount/latestPrice).toFixed(FIXA).toString()
+                let amount = ((ranNum-1) * defaultAmount/latestPrice).toFixed(FIXA).toString()
                 let price = (bestBid.pricepoint / 10 ** 18).toFixed(FIXP)
                 let side = 'BUY'
                 let o = await tomox.createOrder({
@@ -114,14 +116,13 @@ const match = async () => {
 
             }
         } else {
-            if (orderBookData.bids.length > 4) {
-                const bestAsk = orderBookData.bids[4]
+            if (orderBookData.bids.length >= ORDERBOOK_LENGTH) {
+                const bestAsk = orderBookData.bids[ORDERBOOK_LENGTH - 1]
                 const latestPrice = await getLatestPrice()
-                let amount = (4 * defaultAmount/latestPrice).toFixed(FIXA).toString()
+                let amount = (ranNum * defaultAmount/latestPrice).toFixed(FIXA).toString()
                 let price = (bestAsk.pricepoint / 10 ** 18).toFixed(FIXP)
                 let side = 'SELL'
 
-                // await createOrder(newAskOrder)
                 let o = await tomox.createOrder({
                     baseToken: process.env.BTC_ADDRESS,
                     quoteToken: process.env.TOMO_ADDRESS,
