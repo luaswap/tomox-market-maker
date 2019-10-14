@@ -59,6 +59,7 @@ const runMarketMaker = async () => {
     } catch (err) {
         console.log(err)
     }
+    process.exit(0)
 }
 
 const handleEmptyOrderbook = async (side) => {
