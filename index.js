@@ -59,14 +59,13 @@ const runMarketMaker = async () => {
     } catch (err) {
         console.log(err)
     }
-    process.exit(0)
 }
 
 const handleEmptyOrderbook = async (side) => {
     let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
     try {
         const latestPrice = await getLatestPrice()
-        let amount = (defaultAmount/latestPrice).toFixed(FIXA).toString()
+        let amount = defaultAmount / latestPrice
         let price = (side === 'BUY' ? latestPrice - (ORDERBOOK_LENGTH - 1) * minimumPriceStepChange : latestPrice + (ORDERBOOK_LENGTH - 1) * minimumPriceStepChange)
         let orders = []
         for (let i = 0; i < ORDERBOOK_LENGTH - 1; i++) {
@@ -74,7 +73,7 @@ const handleEmptyOrderbook = async (side) => {
                 baseToken: process.env.BTC_ADDRESS,
                 quoteToken: process.env.TOMO_ADDRESS,
                 price: (price + (i * minimumPriceStepChange)).toFixed(FIXP),
-                amount: amount * ranNum,
+                amount: (amount * ranNum).toFixed(FIXA),
                 side: side
             }
             orders.push(o)
@@ -86,13 +85,11 @@ const handleEmptyOrderbook = async (side) => {
     } catch (err) {
         console.log(err)
     }
-    process.exit(0)
 }
 
 const cancel = async (hash, nonce) => {
     const oc = await tomox.cancelOrder(hash, nonce)
     console.log('CANCEL BTC/TOMO', hash, nonce)
-    process.exit(0)
 }
 
 const match = async () => {
@@ -100,7 +97,6 @@ const match = async () => {
     try {
         const orderBookData = await getOrderBook(process.env.BTC_ADDRESS, process.env.TOMO_ADDRESS)
         if (!orderBookData) {
-            process.exit(0)
             return
         }
 
@@ -143,7 +139,6 @@ const match = async () => {
     } catch (err) {
         console.log(err)
     }
-    process.exit(0)
 }
 
 const calculateOrder = async (side) => {
@@ -156,5 +151,13 @@ const calculateOrder = async (side) => {
     return { price, amount }
 }
 
-runMarketMaker()
+
+const run = async () => {
+    while(true) {
+        await runMarketMaker()
+        await sleep(4000)
+    }
+}
+
+run()
 
