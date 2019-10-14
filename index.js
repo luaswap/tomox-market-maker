@@ -11,6 +11,8 @@ const FIXA = 1 // amount decimals
 const FIXP = 0 // price decimals
 const ORDERBOOK_LENGTH = 5 // number of order in orderbook
 
+let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
+
 const runMarketMaker = async () => {
     let hash = false
     let nonce = 0
@@ -28,41 +30,35 @@ const runMarketMaker = async () => {
             return await handleEmptyOrderbook('SELL')
         }
 
+        let side = 'SELL'
         if (orderBookData.bids.length <= orderBookData.asks.length) {
-            const bestBid = orderBookData.bids[0]
-            let { price, amount } = calculateBetterBid(bestBid)
-            let o = await tomox.createOrder({
-                baseToken: process.env.BTC_ADDRESS,
-                quoteToken: process.env.TOMO_ADDRESS,
-                price: price,
-                amount: amount,
-                side: 'BUY'
-            })
-            hash = o.hash
-            nonce = parseInt(o.nonce) + 1
-            console.log('BUY BTC/TOMO', price, amount, o.nonce)
-        } else {
-            const bestAsk = orderBookData.asks[0]
-            let { price, amount }= calculateBetterAsk(bestAsk)
-            let o = await tomox.createOrder({
-                baseToken: process.env.BTC_ADDRESS,
-                quoteToken: process.env.TOMO_ADDRESS,
-                price: price,
-                amount: amount,
-                side: 'SELL'
-            })
-            hash = o.hash
-            nonce = parseInt(o.nonce) + 1
-            console.log('SELL BTC/TOMO', price, amount, o.nonce)
+            side = 'BUY'
+        }
+        let { price, amount } = await calculateOrder(side)
+        let o = await tomox.createOrder({
+            baseToken: process.env.BTC_ADDRESS,
+            quoteToken: process.env.TOMO_ADDRESS,
+            price: price,
+            amount: amount,
+            side: side
+        })
+        hash = o.hash
+        nonce = parseInt(o.nonce) + 1
+        console.log(side, 'BTC/TOMO', price, amount, o.nonce)
+        if (orderBookData.asks.length >= ORDERBOOK_LENGTH
+            || orderBookData.bids.length >= ORDERBOOK_LENGTH) {
+            await sleep(5000)
+            await match()
+        }
+
+        if (Math.floor(Math.random() * 5) == 2 && hash) {
+            await sleep(5000)
+            await cancel(hash, nonce)
         }
 
     } catch (err) {
         console.log(err)
     }
-    if (Math.floor(Math.random() * 5) == 2 && hash) {
-        await cancel(hash, nonce)
-    }
-    setTimeout(match, 10000);
 }
 
 const handleEmptyOrderbook = async (side) => {
@@ -95,6 +91,7 @@ const handleEmptyOrderbook = async (side) => {
 const cancel = async (hash, nonce) => {
     const oc = await tomox.cancelOrder(hash, nonce)
     console.log('CANCEL BTC/TOMO', hash, nonce)
+    process.exit(0)
 }
 
 const match = async () => {
@@ -148,29 +145,15 @@ const match = async () => {
     process.exit(0)
 }
 
-
-const calculateBetterBid = (currentBestBid) => {
+const calculateOrder = async (side) => {
     let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
-    const newBidOrder = {
-        amount: (defaultAmount * ranNum/(currentBestBid.pricepoint/1e+18)).toFixed(FIXA),
-        price: (new BigNumber(currentBestBid.pricepoint/1e+18).plus(minimumPriceStepChange)).toFixed(FIXP).toString()
-    }
+    const latestPrice = await getLatestPrice()
+    let amount = (defaultAmount/latestPrice).toFixed(FIXA)
+    let price = side === 'BUY' ? ((latestPrice - ranNum * minimumPriceStepChange)).toFixed(FIXP)
+        : ((latestPrice + ranNum * minimumPriceStepChange)).toFixed(FIXP)
 
-    return newBidOrder
+    return { price, amount }
 }
 
-const calculateBetterAsk = (currentBestAsk) => {
-    let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
-    const newAskOrder = {
-        amount: (defaultAmount * ranNum/(currentBestAsk.pricepoint/1e+18)).toFixed(FIXA),
-        price: (new BigNumber(currentBestAsk.pricepoint/1e+18).minus(minimumPriceStepChange)).toFixed(FIXP).toString()
-    }
-
-    return newAskOrder
-}
-
-/**
- * Fetch order book
- */
 runMarketMaker()
 
