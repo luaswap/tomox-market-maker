@@ -51,10 +51,12 @@ const runMarketMaker = async () => {
             await match()
         }
 
+        /*
         if (Math.floor(Math.random() * 5) == 2 && hash) {
             await sleep(5000)
             await cancel(hash, nonce)
         }
+        */
 
     } catch (err) {
         console.log(err)
