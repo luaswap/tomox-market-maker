@@ -1,0 +1,15 @@
+{
+    "BTCTOMO": {
+        "pkey": "0xxxx",
+        "baseToken": "0xBD8b2Fb871F97b2d5F0A1af3bF73619b09174B2A",
+        "quoteToken": "0x0000000000000000000000000000000000000001"
+    },
+    "ETHTOMO": {
+        "pkey": "0xxxx",
+        "baseToken": "0x9839B789b09292c175Cc7173337520fE8fd9d8FE",
+        "quoteToken": "0x0000000000000000000000000000000000000001",
+        "price": 3000
+    },
+    "exchangeAddress": "0x5DCFb4Dc28FBdD2b21af9138E94f5316f5EE6bC9",
+    "relayerUrl": "http://localhost:3001"
+}
