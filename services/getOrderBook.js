@@ -1,11 +1,9 @@
 const axios = require('axios')
+const config = require('config')
 
 const getOrderBook = async (baseToken = null, quoteToken = null) => {
     try {
-        baseToken = baseToken || process.env.BTC_ADDRESS
-        quoteToken = quoteToken || process.env.TOMO_ADDRESS
-
-        const response = await axios.get(`${process.env.RELAYER_URL}/api/orderbook?baseToken=${baseToken}&quoteToken=${quoteToken}`)
+        const response = await axios.get(`${config.get('relayerUrl')}/api/orderbook?baseToken=${baseToken}&quoteToken=${quoteToken}`)
 
         return response.data.data
     } catch (err) {

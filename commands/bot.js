@@ -25,15 +25,13 @@ const createOrder = async (price, amount, side) => {
         amount: amount,
         side: side
     })
-    console.log(side, pair, price, amount, o.nonce)
+    console.log(side, pair, price, amount, o.nonce, o.hash)
     return o
 }
 
 const runMarketMaker = async () => {
-    /*
     let hash = false
     let nonce = 0
-    */
     try {
         const orderBookData = await getOrderBook(baseToken, quoteToken)
         if (!orderBookData) {
@@ -59,17 +57,15 @@ const runMarketMaker = async () => {
             side = 'BUY'
         }
         let { price, amount } = await calculateOrder(side)
-        return createOrder(price, amount, side)
+        let o = await createOrder(price, amount, side)
 
-        /*
         hash = o.hash
         nonce = parseInt(o.nonce) + 1
 
         if (Math.floor(Math.random() * 5) == 2 && hash) {
-            await sleep(5000)
+            await sleep(4000)
             await cancel(hash, nonce)
         }
-        */
 
     } catch (err) {
         console.log(err)
@@ -96,7 +92,7 @@ const handleEmptyOrderbook = async (side) => {
         }
         let ret = await tomox.createManyOrders(orders)
         orders.forEach((or, k) => {
-            console.log(side, pair, or.price, or.amount, ret[k].nonce)
+            console.log(side, pair, or.price, or.amount, ret[k].nonce, ret[k].hash)
         })
     } catch (err) {
         console.log(err)
@@ -105,7 +101,7 @@ const handleEmptyOrderbook = async (side) => {
 
 const cancel = async (hash, nonce) => {
     const oc = await tomox.cancelOrder(hash, nonce)
-    console.log('CANCEL BTC/TOMO', hash, nonce)
+    console.log('CANCEL', pair, hash, nonce)
 }
 
 const match = async () => {
