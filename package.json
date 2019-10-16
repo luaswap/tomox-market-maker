@@ -1,9 +1,9 @@
 {
-  "name": "dex-market-maker",
+  "name": "tomox-market-maker",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node index.js",
+    "start": "node cmd.js bot BTCTOMO",
     "lint": "eslint --cache ./ --ext .js"
   },
   "dependencies": {

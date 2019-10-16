@@ -1,4 +1,4 @@
-# dex-market-maker
+# tomox-market-maker
 _Simple market maker to create liquidity for TomoX_
 
 ## Install
@@ -17,16 +17,6 @@ Please configure cron template to match your need.
 At the moment, this market maker support only one pair BTC/TOMO on TomoX (for testing purpose)
 
 ```
-npm start
+node cmd.js bot BTCTOMO
 ```
 
-## Run Bot
-```
-pm2 start npm --cron "*/1 * * * *" --name bot -- start
-
-```
-
-## Contribution
-
-Please try your best to follow the guidance here:
-https://chris.beams.io/posts/git-commit/
