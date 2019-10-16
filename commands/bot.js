@@ -25,7 +25,7 @@ const createOrder = async (price, amount, side) => {
         amount: amount,
         side: side
     })
-    console.log(side, pair, price, amount, o.nonce, o.hash)
+    console.log(side, pair, price, amount, o.hash, o.nonce)
     return o
 }
 
@@ -92,7 +92,7 @@ const handleEmptyOrderbook = async (side) => {
         }
         let ret = await tomox.createManyOrders(orders)
         orders.forEach((or, k) => {
-            console.log(side, pair, or.price, or.amount, ret[k].nonce, ret[k].hash)
+            console.log(side, pair, or.price, or.amount, ret[k].hash, ret[k].nonce)
         })
     } catch (err) {
         console.log(err)
