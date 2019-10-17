@@ -14,7 +14,7 @@ Update `local.json` file with your parameters
 
 ## Usage
 
-At the moment, this market maker support only one pair BTC/TOMO on TomoX (for testing purpose)
+The bot support any pairs with proper config
 
 ```
 node cmd.js bot BTCTOMO
