@@ -1,15 +1,16 @@
 # tomox-market-maker
-_Simple market maker to create liquidity for TomoX_
+_Simple market maker to create liquidity/volume for TomoX_
+
 
 ## Install
 ```
 npm install
+Create `config/local.json` file
 ```
-
+cp config/default.json config/local.json
 ```
-Update .env file with your parameters
+Update `local.json` file with your parameters
 
-Please configure cron template to match your need.
 ```
 
 ## Usage
