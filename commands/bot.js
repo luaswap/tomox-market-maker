@@ -1,6 +1,5 @@
 const { getOrderBook } = require('../services/getOrderBook')
 const { getLatestPrice } = require('../services/coingecko')
-require('dotenv').config()
 const TomoX = require('tomoxjs')
 const BigNumber = require('bignumber.js')
 const config = require('config')
