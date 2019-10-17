@@ -5,13 +5,12 @@ _Simple market maker to create liquidity/volume for TomoX_
 ## Install
 ```
 npm install
+```
 Create `config/local.json` file
 ```
 cp config/default.json config/local.json
 ```
 Update `local.json` file with your parameters
-
-```
 
 ## Usage
 
