@@ -155,11 +155,11 @@ const run = async (p) => {
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
 
-    let latestPrice = await getLatestPrice(pair)
-    defaultAmount = Math.round(latestPrice/3)
-    minimumPriceStepChange = latestPrice * (5 / 1000)
     FIXA = 5 // amount decimals
     FIXP = 5 // price decimals
+    let latestPrice = parseFloat((await getLatestPrice(pair)).toFixed(FIXP))
+    defaultAmount = parseFloat((latestPrice/3).toFixed(FIXA))
+    minimumPriceStepChange = latestPrice * (5 / 1000)
     while(true) {
         await runMarketMaker()
         await sleep(4000)
