@@ -158,7 +158,7 @@ const run = async (p) => {
     let latestPrice = await getLatestPrice(pair)
     defaultAmount = Math.round(latestPrice/3)
     minimumPriceStepChange = latestPrice * (5 / 1000)
-    FIXA = 1 // amount decimals
+    FIXA = 5 // amount decimals
     FIXP = 5 // price decimals
     while(true) {
         await runMarketMaker()
