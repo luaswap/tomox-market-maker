@@ -11,5 +11,6 @@
         "price": 3000
     },
     "exchangeAddress": "0x5DCFb4Dc28FBdD2b21af9138E94f5316f5EE6bC9",
-    "relayerUrl": "http://localhost:3001"
+    "relayerUrl": "http://localhost:3001",
+    "orderbookLength": 5
 }
