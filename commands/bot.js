@@ -37,13 +37,10 @@ const runMarketMaker = async () => {
             return
         }
 
-        if (orderBookData.bids.length === 0) {
-            return handleEmptyOrderbook('BUY')
-        }
-
-        if (orderBookData.asks.length === 0) {
-            return handleEmptyOrderbook('SELL')
-        }
+        let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY')
+        let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL')
+        let nonce = sell.nonce || buy.nonce
+        let hash = sell.hash || buy.hash
 
         if (orderBookData.asks.length >= ORDERBOOK_LENGTH
             && orderBookData.bids.length >= ORDERBOOK_LENGTH) {
@@ -51,17 +48,7 @@ const runMarketMaker = async () => {
             return match()
         }
 
-        let side = 'SELL'
-        if (orderBookData.bids.length <= orderBookData.asks.length) {
-            side = 'BUY'
-        }
-        let { price, amount } = await calculateOrder(side)
-        let o = await createOrder(price, amount, side)
-
-        hash = o.hash
-        nonce = parseInt(o.nonce) + 1
-
-        if (Math.floor(Math.random() * 5) == 2 && hash) {
+        if (Math.floor(Math.random() * 4) == 2 && hash) {
             await sleep(4000)
             await cancel(hash, nonce)
         }
@@ -71,15 +58,19 @@ const runMarketMaker = async () => {
     }
 }
 
-const handleEmptyOrderbook = async (side) => {
+const fillOrderbook = async (len, side) => {
+    let nonce = 0
+    let hash = 0
+    if (len <= 0) return { nonce,  hash }
+
     let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
     try {
         const latestPrice = await getLatestPrice(pair)
         let amount = defaultAmount / latestPrice
-        let price = (side === 'BUY' ? latestPrice - (ORDERBOOK_LENGTH - 1) * minimumPriceStepChange
-            : latestPrice + (ORDERBOOK_LENGTH - 1) * minimumPriceStepChange)
+        let price = (side === 'BUY' ? latestPrice - len * minimumPriceStepChange
+            : latestPrice + len * minimumPriceStepChange)
         let orders = []
-        for (let i = 0; i < ORDERBOOK_LENGTH - 1; i++) {
+        for (let i = 0; i < len; i++) {
             let o = {
                 baseToken: baseToken,
                 quoteToken: quoteToken,
@@ -91,8 +82,11 @@ const handleEmptyOrderbook = async (side) => {
         }
         let ret = await tomox.createManyOrders(orders)
         orders.forEach((or, k) => {
+            hash = ret[k].hash
+            nonce = ret[k].nonce
             console.log(side, pair, or.price, or.amount, ret[k].hash, ret[k].nonce)
         })
+        return { nonce, hash } 
     } catch (err) {
         console.log(err)
     }
@@ -111,43 +105,19 @@ const match = async () => {
             return
         }
 
-        if (orderBookData.asks.length >= orderBookData.bids.length) {
-            if (orderBookData.asks.length >= ORDERBOOK_LENGTH) {
-                const bestBid = orderBookData.asks[ORDERBOOK_LENGTH - 1]
-                const latestPrice = await getLatestPrice(pair)
-                let amount = (ranNum * defaultAmount/latestPrice).toFixed(FIXA).toString()
-                let price = (bestBid.pricepoint / 10 ** 18).toFixed(FIXP)
-                let side = 'BUY'
-                let o = await createOrder(price, amount, side)
-
-            }
-        } else {
-            if (orderBookData.bids.length >= ORDERBOOK_LENGTH) {
-                const bestAsk = orderBookData.bids[ORDERBOOK_LENGTH - 1]
-                const latestPrice = await getLatestPrice(pair)
-                let amount = (ranNum * defaultAmount/latestPrice).toFixed(FIXA).toString()
-                let price = (bestAsk.pricepoint / 10 ** 18).toFixed(FIXP)
-                let side = 'SELL'
-
-                let o = await createOrder(price, amount, side)
-            }
-        }
+        let side = (ranNum % 2) ? 'BUY' : 'SELL'
+        const bestBid = orderBookData.asks[ORDERBOOK_LENGTH - 1]
+        const bestAsk = orderBookData.bids[ORDERBOOK_LENGTH - 1]
+        const latestPrice = await getLatestPrice(pair)
+        let amount = (ranNum * defaultAmount/latestPrice).toFixed(FIXA).toString()
+        let price = (side === 'SELL') ? (bestAsk.pricepoint / 10 ** 18).toFixed(FIXP)
+            : (bestBid.pricepoint / 10 ** 18).toFixed(FIXP)
+        await createOrder(price, amount, side)
 
     } catch (err) {
         console.log(err)
     }
 }
-
-const calculateOrder = async (side) => {
-    let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
-    const latestPrice = await getLatestPrice(pair)
-    let amount = (defaultAmount/latestPrice).toFixed(FIXA)
-    let price = side === 'BUY' ? ((latestPrice - ranNum * minimumPriceStepChange)).toFixed(FIXP)
-        : ((latestPrice + ranNum * minimumPriceStepChange)).toFixed(FIXP)
-
-    return { price, amount }
-}
-
 
 const run = async (p) => {
     tomox = new TomoX(config.get('relayerUrl'), config[p].pkey)
