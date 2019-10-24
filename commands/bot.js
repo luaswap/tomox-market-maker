@@ -63,18 +63,18 @@ const fillOrderbook = async (len, side) => {
     let hash = 0
     if (len <= 0) return { nonce,  hash }
 
-    let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
     try {
         const latestPrice = await getLatestPrice(pair)
         let amount = defaultAmount
-        let price = (side === 'BUY' ? latestPrice - len * minimumPriceStepChange
-            : latestPrice + len * minimumPriceStepChange)
         let orders = []
         for (let i = 0; i < len; i++) {
+            let price = (side === 'BUY' ? latestPrice - i * len * minimumPriceStepChange
+                : latestPrice + i * len * minimumPriceStepChange)
+            let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
             let o = {
                 baseToken: baseToken,
                 quoteToken: quoteToken,
-                price: (price + (i * minimumPriceStepChange)).toFixed(FIXP),
+                price: price,
                 amount: (amount * ranNum).toFixed(FIXA),
                 side: side
             }
