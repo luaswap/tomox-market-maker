@@ -74,7 +74,7 @@ const fillOrderbook = async (len, side) => {
             let o = {
                 baseToken: baseToken,
                 quoteToken: quoteToken,
-                price: price,
+                price: price.toFixed(FIXP),
                 amount: (amount * ranNum).toFixed(FIXA),
                 side: side
             }
@@ -125,25 +125,24 @@ const run = async (p) => {
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
 
-    let price = config[pair].price || 0
-    let latestPrice = parseFloat((await getLatestPrice(pair)).toFixed(FIXP))
-    minimumPriceStepChange = latestPrice * (1 / 1000)
+    let price = parseFloat(await getLatestPrice(pair))
+    minimumPriceStepChange = price*(1 / 1000)
     if ((1 / parseFloat(price)) > 10) {
         FIXA = 3 
         FIXP = 3
-        minimumPriceStepChange = latestPrice * (5 / 1000)
+        minimumPriceStepChange = price * (5 / 1000)
     }
     if ((1 / parseFloat(price)) > 100) {
         FIXA = 5
         FIXP = 5
         defaultAmount = 10
-        minimumPriceStepChange = latestPrice * (1 / 1000)
+        minimumPriceStepChange = price * (1 / 1000)
     }
     if ((1 / parseFloat(price)) > 1000) {
         FIXA = 7
         FIXP = 7
         defaultAmount = 100
-        minimumPriceStepChange = latestPrice * (5 / 100)
+        minimumPriceStepChange = (5 / 100) * price
     }
 
     while(true) {
