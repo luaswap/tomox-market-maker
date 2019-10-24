@@ -68,8 +68,8 @@ const fillOrderbook = async (len, side) => {
         let amount = defaultAmount
         let orders = []
         for (let i = 0; i < len; i++) {
-            let price = (side === 'BUY' ? latestPrice - i * len * minimumPriceStepChange
-                : latestPrice + i * len * minimumPriceStepChange)
+            let price = (side === 'BUY' ? latestPrice - (i + 1) * len * minimumPriceStepChange
+                : latestPrice + (i + 1) * len * minimumPriceStepChange)
             let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
             let o = {
                 baseToken: baseToken,
