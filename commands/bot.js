@@ -4,10 +4,10 @@ const TomoX = require('tomoxjs')
 const BigNumber = require('bignumber.js')
 const config = require('config')
 
-let defaultAmount = 10000 // TOMO
+let defaultAmount = 1 // TOMO
 let minimumPriceStepChange = 1 // TOMO
 let FIXA = 1 // amount decimals
-let FIXP = 0 // price decimals
+let FIXP = 1 // price decimals
 let ORDERBOOK_LENGTH = config.get('orderbookLength') // number of order in orderbook
 let tomox = new TomoX()
 let pair = 'BTCTOMO'
@@ -66,7 +66,7 @@ const fillOrderbook = async (len, side) => {
     let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
     try {
         const latestPrice = await getLatestPrice(pair)
-        let amount = defaultAmount / latestPrice
+        let amount = defaultAmount
         let price = (side === 'BUY' ? latestPrice - len * minimumPriceStepChange
             : latestPrice + len * minimumPriceStepChange)
         let orders = []
@@ -109,7 +109,7 @@ const match = async () => {
         const bestBid = orderBookData.asks[ORDERBOOK_LENGTH - 1]
         const bestAsk = orderBookData.bids[ORDERBOOK_LENGTH - 1]
         const latestPrice = await getLatestPrice(pair)
-        let amount = (ranNum * defaultAmount/latestPrice).toFixed(FIXA).toString()
+        let amount = (ranNum * defaultAmount).toFixed(FIXA).toString()
         let price = (side === 'SELL') ? (bestAsk.pricepoint / 10 ** 18).toFixed(FIXP)
             : (bestBid.pricepoint / 10 ** 18).toFixed(FIXP)
         await createOrder(price, amount, side)
@@ -125,11 +125,27 @@ const run = async (p) => {
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
 
-    FIXA = 7 // amount decimals
-    FIXP = 7 // price decimals
+    let price = config[pair].price || 0
     let latestPrice = parseFloat((await getLatestPrice(pair)).toFixed(FIXP))
-    defaultAmount = parseFloat((latestPrice/3).toFixed(FIXA))
     minimumPriceStepChange = latestPrice * (1 / 1000)
+    if ((1 / parseFloat(price)) > 10) {
+        FIXA = 3 
+        FIXP = 3
+        minimumPriceStepChange = latestPrice * (5 / 1000)
+    }
+    if ((1 / parseFloat(price)) > 100) {
+        FIXA = 5
+        FIXP = 5
+        defaultAmount = 10
+        minimumPriceStepChange = latestPrice * (1 / 1000)
+    }
+    if ((1 / parseFloat(price)) > 1000) {
+        FIXA = 7
+        FIXP = 7
+        defaultAmount = 100
+        minimumPriceStepChange = latestPrice * (5 / 100)
+    }
+
     while(true) {
         await runMarketMaker()
         await sleep(4000)
