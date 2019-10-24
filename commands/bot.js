@@ -133,13 +133,13 @@ const run = async (p) => {
         minimumPriceStepChange = price * (5 / 1000)
     }
     if ((1 / parseFloat(price)) > 100) {
-        FIXA = 5
+        FIXA = 1
         FIXP = 5
         defaultAmount = 10
         minimumPriceStepChange = price * (1 / 1000)
     }
     if ((1 / parseFloat(price)) > 1000) {
-        FIXA = 7
+        FIXA = 1
         FIXP = 7
         defaultAmount = 100
         minimumPriceStepChange = (5 / 100) * price
