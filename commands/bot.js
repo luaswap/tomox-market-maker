@@ -6,8 +6,8 @@ const config = require('config')
 
 let defaultAmount = 1 // TOMO
 let minimumPriceStepChange = 1 // TOMO
-let FIXA = 1 // amount decimals
-let FIXP = 1 // price decimals
+let FIXA = 5 // amount decimals
+let FIXP = 7 // price decimals
 let ORDERBOOK_LENGTH = config.get('orderbookLength') // number of order in orderbook
 let tomox = new TomoX()
 let pair = 'BTCTOMO'
@@ -37,16 +37,19 @@ const runMarketMaker = async () => {
             return
         }
 
-        let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY')
-        let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL')
-        let nonce = sell.nonce || buy.nonce
-        let hash = sell.hash || buy.hash
-
         if (orderBookData.asks.length >= ORDERBOOK_LENGTH
             && orderBookData.bids.length >= ORDERBOOK_LENGTH) {
             console.log('MATCHED ORDER !!!')
             return match()
         }
+
+        let askPrice = (orderBookData.asks.length > 0 ) ? orderBookData.asks[orderBookData.asks.length - 1].pricepoint / 10 ** 18 : 0
+        let bidPrice = (orderBookData.bids.length > 0) ? orderBookData.bids[orderBookData.bids.length - 1].pricepoint / 10 ** 18 : 0
+
+        let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, bidPrice)
+        let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', buy.nonce, askPrice)
+        let nonce = sell.nonce || buy.nonce
+        let hash = sell.hash || buy.hash
 
         if (Math.floor(Math.random() * 4) == 2 && hash) {
             await sleep(4000)
@@ -58,28 +61,39 @@ const runMarketMaker = async () => {
     }
 }
 
-const fillOrderbook = async (len, side) => {
-    let nonce = 0
+const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
     let hash = 0
     if (len <= 0) return { nonce,  hash }
 
     try {
-        const latestPrice = await getLatestPrice(pair)
+        let k = 1
+        if (latestPrice === 0) {
+            k = 2
+            latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(1e8)
+        } else {
+            latestPrice = new BigNumber(latestPrice).multipliedBy(1e8)
+        }
         let amount = defaultAmount
         let orders = []
         for (let i = 0; i < len; i++) {
-            let price = (side === 'BUY' ? latestPrice - (i + 1) * len * minimumPriceStepChange
-                : latestPrice + (i + 1) * len * minimumPriceStepChange)
+            let step = minimumPriceStepChange.multipliedBy(i + 1)
+            let price = (side === 'BUY') ? latestPrice.minus(step)
+                : latestPrice.plus(step)
             let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
+
             let o = {
                 baseToken: baseToken,
                 quoteToken: quoteToken,
-                price: price.toFixed(FIXP),
+                price: price.dividedBy(1e8).toFixed(FIXP),
                 amount: (amount * ranNum).toFixed(FIXA),
-                side: side
+                side: side,
+            }
+            if (nonce != 0) {
+                o.nonce = parseInt(nonce) + i
             }
             orders.push(o)
         }
+
         let ret = await tomox.createManyOrders(orders)
         orders.forEach((or, k) => {
             hash = ret[k].hash
@@ -108,8 +122,7 @@ const match = async () => {
         let side = (ranNum % 2) ? 'BUY' : 'SELL'
         const bestBid = orderBookData.asks[ORDERBOOK_LENGTH - 1]
         const bestAsk = orderBookData.bids[ORDERBOOK_LENGTH - 1]
-        const latestPrice = await getLatestPrice(pair)
-        let amount = (ranNum * defaultAmount).toFixed(FIXA).toString()
+        let amount = (ranNum * defaultAmount).toFixed(FIXA)
         let price = (side === 'SELL') ? (bestAsk.pricepoint / 10 ** 18).toFixed(FIXP)
             : (bestBid.pricepoint / 10 ** 18).toFixed(FIXP)
         await createOrder(price, amount, side)
@@ -125,29 +138,19 @@ const run = async (p) => {
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
 
-    let price = parseFloat(await getLatestPrice(pair))
-    minimumPriceStepChange = price*(1 / 1000)
-    if ((1 / parseFloat(price)) > 10) {
-        FIXA = 3 
-        FIXP = 3
-        minimumPriceStepChange = price * (5 / 1000)
-    }
-    if ((1 / parseFloat(price)) > 100) {
-        FIXA = 1
-        FIXP = 5
-        defaultAmount = 10
-        minimumPriceStepChange = price * (1 / 1000)
-    }
-    if ((1 / parseFloat(price)) > 1000) {
-        FIXA = 1
-        FIXP = 7
-        defaultAmount = 100
-        minimumPriceStepChange = (5 / 100) * price
+    let price = new BigNumber(parseFloat(await getLatestPrice(pair))).multipliedBy(1e+8)
+    minimumPriceStepChange = price.dividedBy(1e3)
+    
+    if (pair.endsWith('BTC')) {
+        defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(1e+8).multipliedBy(0.001).toFixed(FIXA))
+        minimumPriceStepChange = price.dividedBy(1e2)
+    } else {
+        defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(1e+8).multipliedBy(100).toFixed(FIXA))
     }
 
     while(true) {
         await runMarketMaker()
-        await sleep(4000)
+        await sleep(50000) // 50 seconds
     }
 }
 
