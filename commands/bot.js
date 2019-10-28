@@ -148,6 +148,10 @@ const run = async (p) => {
         defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(1e+8).multipliedBy(100).toFixed(FIXA))
     }
 
+    if (defaultAmount > 1) {
+        FIXA = 2
+    }
+
     while(true) {
         await runMarketMaker()
         await sleep(50000) // 50 seconds
