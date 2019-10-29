@@ -13,6 +13,8 @@ let tomox = new TomoX()
 let pair = 'BTCTOMO'
 let baseToken = config.get(`${pair}.baseToken`)
 let quoteToken = config.get(`${pair}.quoteToken`)
+let TOKEN_DECIMALS = 1e18
+let EX_DECIMALS = 1e8
 
 let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
 
@@ -43,8 +45,23 @@ const runMarketMaker = async () => {
             return match()
         }
 
+
         let askPrice = (orderBookData.asks.length > 0 ) ? orderBookData.asks[orderBookData.asks.length - 1].pricepoint / 10 ** 18 : 0
         let bidPrice = (orderBookData.bids.length > 0) ? orderBookData.bids[orderBookData.bids.length - 1].pricepoint / 10 ** 18 : 0
+
+        if (askPrice != 0 && bidPrice != 0) {
+            let latestAskPrice = orderBookData.asks[0].pricepoint / TOKEN_DECIMALS
+            let latestBidPrice = orderBookData.bids[0].pricepoint / TOKEN_DECIMALS
+            // let check = minimumPriceStepChange.multipliedBy(ORDERBOOK_LENGTH).dividedBy(EX_DECIMALS).plus(latestBidPrice).isLessThan(latestAskPrice)
+            let check = minimumPriceStepChange
+                .multipliedBy((2 * ORDERBOOK_LENGTH) - orderBookData.bids.length - orderBookData.asks.length)
+                .dividedBy(EX_DECIMALS).plus(latestBidPrice).isLessThan(latestAskPrice)
+
+            if (check) {
+                bidPrice = latestAskPrice
+                askPrice = latestBidPrice
+            }
+        }
 
         let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, bidPrice)
         let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', buy.nonce, askPrice)
@@ -89,7 +106,7 @@ const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
                 side: side,
             }
             if (nonce != 0) {
-                o.nonce = parseInt(nonce) + i
+                o.nonce = parseInt(nonce) + i + 1
             }
             orders.push(o)
         }
@@ -138,14 +155,14 @@ const run = async (p) => {
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
 
-    let price = new BigNumber(parseFloat(await getLatestPrice(pair))).multipliedBy(1e+8)
+    let price = new BigNumber(parseFloat(await getLatestPrice(pair))).multipliedBy(EX_DECIMALS)
     minimumPriceStepChange = price.dividedBy(1e3)
     
     if (pair.endsWith('BTC')) {
-        defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(1e+8).multipliedBy(0.001).toFixed(FIXA))
+        defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(EX_DECIMALS).multipliedBy(0.001).toFixed(FIXA))
         minimumPriceStepChange = price.dividedBy(1e2)
     } else {
-        defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(1e+8).multipliedBy(100).toFixed(FIXA))
+        defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(EX_DECIMALS).multipliedBy(100).toFixed(FIXA))
     }
 
     if (defaultAmount > 1) {
