@@ -52,9 +52,8 @@ const runMarketMaker = async () => {
         if (askPrice != 0 && bidPrice != 0) {
             let latestAskPrice = orderBookData.asks[0].pricepoint / TOKEN_DECIMALS
             let latestBidPrice = orderBookData.bids[0].pricepoint / TOKEN_DECIMALS
-            // let check = minimumPriceStepChange.multipliedBy(ORDERBOOK_LENGTH).dividedBy(EX_DECIMALS).plus(latestBidPrice).isLessThan(latestAskPrice)
             let check = minimumPriceStepChange
-                .multipliedBy((2 * ORDERBOOK_LENGTH) - orderBookData.bids.length - orderBookData.asks.length)
+                .multipliedBy((2 * ORDERBOOK_LENGTH + 1) - orderBookData.bids.length - orderBookData.asks.length)
                 .dividedBy(EX_DECIMALS).plus(latestBidPrice).isLessThan(latestAskPrice)
 
             if (check) {
