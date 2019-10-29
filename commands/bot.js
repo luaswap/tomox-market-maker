@@ -17,6 +17,8 @@ let TOKEN_DECIMALS = 1e18
 let EX_DECIMALS = 1e8
 
 let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
+let sellPrices = []
+let buyPrices = []
 
 const createOrder = async (price, amount, side) => {
     let o = await tomox.createOrder({
@@ -46,24 +48,17 @@ const runMarketMaker = async () => {
         }
 
 
-        let askPrice = (orderBookData.asks.length > 0 ) ? orderBookData.asks[orderBookData.asks.length - 1].pricepoint / 10 ** 18 : 0
-        let bidPrice = (orderBookData.bids.length > 0) ? orderBookData.bids[orderBookData.bids.length - 1].pricepoint / 10 ** 18 : 0
+        let askPrice = (orderBookData.asks.length > 0 ) ? orderBookData.asks[0].pricepoint / TOKEN_DECIMALS : 0
+        let bidPrice = (orderBookData.bids.length > 0) ? orderBookData.bids[0].pricepoint / TOKEN_DECIMALS : 0
 
-        if (askPrice != 0 && bidPrice != 0) {
-            let latestAskPrice = orderBookData.asks[0].pricepoint / TOKEN_DECIMALS
-            let latestBidPrice = orderBookData.bids[0].pricepoint / TOKEN_DECIMALS
-            let check = minimumPriceStepChange
-                .multipliedBy((2 * ORDERBOOK_LENGTH + 1) - orderBookData.bids.length - orderBookData.asks.length)
-                .dividedBy(EX_DECIMALS).plus(latestBidPrice).isLessThan(latestAskPrice)
+        sellPrices = []
+        buyPrices = []
 
-            if (check) {
-                bidPrice = latestAskPrice
-                askPrice = latestBidPrice
-            }
-        }
+        orderBookData.asks.forEach(a => sellPrices.push(a.pricepoint))
+        orderBookData.bids.forEach(a => buyPrices.push(a.pricepoint))
 
-        let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, bidPrice)
-        let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', buy.nonce, askPrice)
+        let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, askPrice)
+        let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', buy.nonce, bidPrice)
         let nonce = sell.nonce || buy.nonce
         let hash = sell.hash || buy.hash
 
@@ -77,14 +72,32 @@ const runMarketMaker = async () => {
     }
 }
 
+const findGoodPrice = (side, latestPrice) => {
+    let i = 1
+    while (true) {
+        let step = minimumPriceStepChange.multipliedBy(i)
+        let price = (side === 'BUY') ? latestPrice.minus(step)
+            : latestPrice.plus(step)
+        let pricepoint = price.dividedBy(EX_DECIMALS).multipliedBy(TOKEN_DECIMALS).toFixed(0)
+
+        if (side === 'BUY' && buyPrices.indexOf(pricepoint) < 0) {
+            buyPrices.push(pricepoint)
+            return price
+        } else if (side !== 'BUY' && sellPrices.indexOf(pricepoint) < 0) {
+            sellPrices.push(pricepoint)
+            return price
+        } else {
+            i = i + 1
+        }
+    }
+}
+
 const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
     let hash = 0
     if (len <= 0) return { nonce,  hash }
 
     try {
-        let k = 1
         if (latestPrice === 0) {
-            k = 2
             latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(1e8)
         } else {
             latestPrice = new BigNumber(latestPrice).multipliedBy(1e8)
@@ -92,9 +105,7 @@ const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
         let amount = defaultAmount
         let orders = []
         for (let i = 0; i < len; i++) {
-            let step = minimumPriceStepChange.multipliedBy(i + 1)
-            let price = (side === 'BUY') ? latestPrice.minus(step)
-                : latestPrice.plus(step)
+            let price = findGoodPrice(side, latestPrice)
             let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
 
             let o = {
@@ -166,6 +177,10 @@ const run = async (p) => {
 
     if (defaultAmount > 1) {
         FIXA = 2
+    }
+
+    if (minimumPriceStepChange.isGreaterThan(1e+8)) {
+        FIXP = 2
     }
 
     while(true) {
