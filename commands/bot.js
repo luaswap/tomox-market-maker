@@ -54,8 +54,8 @@ const runMarketMaker = async () => {
         sellPrices = []
         buyPrices = []
 
-        orderBookData.asks.forEach(a => sellPrices.push(a.pricepoint))
-        orderBookData.bids.forEach(a => buyPrices.push(a.pricepoint))
+        orderBookData.asks.forEach(a => sellPrices.push(new BigNumber(a.pricepoint).dividedBy(TOKEN_DECIMALS).toFixed(FIXP)))
+        orderBookData.bids.forEach(b => buyPrices.push(new BigNumber(b.pricepoint).dividedBy(TOKEN_DECIMALS).toFixed(FIXP)))
 
         let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, askPrice)
         let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', buy.nonce, bidPrice)
@@ -78,7 +78,7 @@ const findGoodPrice = (side, latestPrice) => {
         let step = minimumPriceStepChange.multipliedBy(i)
         let price = (side === 'BUY') ? latestPrice.minus(step)
             : latestPrice.plus(step)
-        let pricepoint = price.dividedBy(EX_DECIMALS).multipliedBy(TOKEN_DECIMALS).toFixed(0)
+        let pricepoint = price.dividedBy(EX_DECIMALS).toFixed(FIXP)
 
         if (side === 'BUY' && buyPrices.indexOf(pricepoint) < 0) {
             buyPrices.push(pricepoint)
