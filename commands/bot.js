@@ -116,7 +116,7 @@ const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
                 side: side,
             }
             if (nonce != 0) {
-                o.nonce = parseInt(nonce) + i + 1
+                o.nonce = parseInt(nonce) + i
             }
             orders.push(o)
         }
@@ -127,7 +127,7 @@ const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
             nonce = ret[k].nonce
             console.log(side, pair, or.price, or.amount, ret[k].hash, ret[k].nonce)
         })
-        return { nonce, hash } 
+        return { nonce:  parseInt(nonce) + 1, hash: hash } 
     } catch (err) {
         console.log(err)
     }
