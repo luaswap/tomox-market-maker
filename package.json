@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node cmd.js bot BTCTOMO",
+    "start": "node cmd.js bot BTC-TOMO",
     "lint": "eslint --cache ./ --ext .js"
   },
   "dependencies": {

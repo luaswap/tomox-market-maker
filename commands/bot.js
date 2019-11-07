@@ -10,7 +10,7 @@ let FIXA = 5 // amount decimals
 let FIXP = 7 // price decimals
 let ORDERBOOK_LENGTH = config.get('orderbookLength') // number of order in orderbook
 let tomox = new TomoX()
-let pair = 'BTCTOMO'
+let pair = 'BTC-TOMO'
 let baseToken = config.get(`${pair}.baseToken`)
 let quoteToken = config.get(`${pair}.quoteToken`)
 let TOKEN_DECIMALS = 1e18
@@ -127,7 +127,7 @@ const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
             nonce = ret[k].nonce
             console.log(side, pair, or.price, or.amount, ret[k].hash, ret[k].nonce)
         })
-        return { nonce:  parseInt(nonce) + 1, hash: hash } 
+        return { nonce:  parseInt(nonce) + 1, hash: hash }
     } catch (err) {
         console.log(err)
     }
@@ -161,13 +161,13 @@ const match = async () => {
 
 const run = async (p) => {
     tomox = new TomoX(config.get('relayerUrl'), config[p].pkey)
-    pair = p || 'BTCTOMO'
+    pair = p || 'BTC-TOMO'
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
 
     let price = new BigNumber(parseFloat(await getLatestPrice(pair))).multipliedBy(EX_DECIMALS)
     minimumPriceStepChange = price.dividedBy(1e3)
-    
+
     if (pair.endsWith('BTC')) {
         defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(EX_DECIMALS).multipliedBy(0.001).toFixed(FIXA))
         minimumPriceStepChange = price.dividedBy(1e2)
