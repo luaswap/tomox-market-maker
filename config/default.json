@@ -4,7 +4,10 @@
         "baseName": "bitcoin",
         "quoteName": "tomochain",
         "baseToken": "0xBD8b2Fb871F97b2d5F0A1af3bF73619b09174B2A",
-        "quoteToken": "0x0000000000000000000000000000000000000001"
+        "quoteToken": "0x0000000000000000000000000000000000000001",
+        "orderbookLength": 10,
+        "speed": 5000,
+        "cancel": true
     },
     "ETH-TOMO": {
         "pkey": "0xxxx",
@@ -15,5 +18,7 @@
         "price": 3000
     },
     "relayerUrl": "http://localhost:3001",
-    "orderbookLength": 5
+    "orderbookLength": 5,
+    "speed": 50000,
+    "cancel": false
 }

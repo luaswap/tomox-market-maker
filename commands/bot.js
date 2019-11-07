@@ -62,7 +62,8 @@ const runMarketMaker = async () => {
         let nonce = sell.nonce || buy.nonce
         let hash = sell.hash || buy.hash
 
-        if (Math.floor(Math.random() * 4) == 2 && hash) {
+        let isCancel = config[pair].cancel || config.cancel || false
+        if (Math.floor(Math.random() * 4) == 2 && hash && isCancel) {
             await sleep(4000)
             await cancel(hash, nonce)
         }
@@ -162,6 +163,7 @@ const match = async () => {
 const run = async (p) => {
     tomox = new TomoX(config.get('relayerUrl'), config[p].pkey)
     pair = p || 'BTC-TOMO'
+    ORDERBOOK_LENGTH = config[p].orderbookLength || config.get('orderbookLength') || 5
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
 
@@ -183,9 +185,10 @@ const run = async (p) => {
         FIXP = 2
     }
 
+    let speed = config[pair].speed || config.speed || 50000
     while(true) {
         await runMarketMaker()
-        await sleep(50000) // 50 seconds
+        await sleep(speed)
     }
 }
 
