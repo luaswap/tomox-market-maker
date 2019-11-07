@@ -26,6 +26,6 @@ You can get pairs information via DEX API, e.g: DEX testnet `https://dex.testnet
 The bot supports any pairs with proper config
 
 ```
-node cmd.js bot BTCTOMO
+node cmd.js bot BTC-TOMO
 ```
 
