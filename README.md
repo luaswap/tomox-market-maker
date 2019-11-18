@@ -13,7 +13,7 @@ cp config/default.json config/local.json
 Update `local.json` file with your parameters
 
 There are some parameters you need to update:
--  `ETHTOMO`: Pair name
+-  `ETH-TOMO`: Pair name
 - `pkey`: Private key of wallet that has enough balance for trades
 - `baseToken` and `quoteToken`: Addresses of pair
 - `relayerUrl`: The url of DEX, e.g `https://dex.testnet.tomochain.com`
