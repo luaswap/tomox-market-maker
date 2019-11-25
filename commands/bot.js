@@ -59,8 +59,8 @@ const runMarketMaker = async () => {
 
         let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, askPrice)
         let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', (buy || {}).nonce, bidPrice)
-        let nonce = sell.nonce || buy.nonce
-        let hash = sell.hash || buy.hash
+        let nonce = (sell || {}).nonce || (buy || {}).nonce
+        let hash = (sell || {}).hash || (buy || {}).hash
 
         let isCancel = config[pair].cancel || config.cancel || false
         if (Math.floor(Math.random() * 4) == 2 && hash && isCancel) {
