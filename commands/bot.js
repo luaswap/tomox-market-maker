@@ -151,8 +151,9 @@ const match = async () => {
         const bestBid = orderBookData.asks[ORDERBOOK_LENGTH - 1]
         const bestAsk = orderBookData.bids[ORDERBOOK_LENGTH - 1]
         let amount = (ranNum * defaultAmount).toFixed(FIXA)
-        let price = (side === 'SELL') ? (bestAsk.pricepoint / 10 ** 18).toFixed(FIXP)
-            : (bestBid.pricepoint / 10 ** 18).toFixed(FIXP)
+        let price = (side === 'SELL') ? (bestAsk.pricepoint / TOKEN_DECIMALS).toFixed(FIXP)
+            : (bestBid.pricepoint / TOKEN_DECIMALS).toFixed(FIXP)
+        console.log(price, amount, side)
         await createOrder(price, amount, side)
 
     } catch (err) {
@@ -169,6 +170,9 @@ const run = async (p) => {
 
     let price = new BigNumber(parseFloat(await getLatestPrice(pair))).multipliedBy(EX_DECIMALS)
     minimumPriceStepChange = price.dividedBy(1e3)
+
+    let d = (await tomox.getTokenInfo(quoteToken)).decimals
+    TOKEN_DECIMALS = 10 ** parseInt(d || 18)
 
     if (pair.endsWith('BTC')) {
         defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(EX_DECIMALS).multipliedBy(0.001).toFixed(FIXA))
