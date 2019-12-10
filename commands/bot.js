@@ -1,4 +1,3 @@
-const { getOrderBook } = require('../services/getOrderBook')
 const { getLatestPrice } = require('../services/coingecko')
 const TomoX = require('tomoxjs')
 const BigNumber = require('bignumber.js')
@@ -36,7 +35,7 @@ const runMarketMaker = async () => {
     let hash = false
     let nonce = 0
     try {
-        const orderBookData = await getOrderBook(baseToken, quoteToken)
+        const orderBookData = await tomox.getOrderBook({baseToken, quoteToken})
         if (!orderBookData) {
             return
         }
@@ -98,16 +97,12 @@ const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
     if (len <= 0) return { nonce,  hash }
 
     try {
-        if (latestPrice === 0) {
-            latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(1e8)
-        } else {
-            latestPrice = new BigNumber(latestPrice).multipliedBy(1e8)
-        }
+        latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(1e8)
         let amount = defaultAmount
         let orders = []
         for (let i = 0; i < len; i++) {
             let price = findGoodPrice(side, latestPrice)
-            let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
+            let ranNum = Math.floor(Math.random() * 20) / 100 + 1
 
             let o = {
                 baseToken: baseToken,
@@ -140,20 +135,35 @@ const cancel = async (hash, nonce) => {
 }
 
 const match = async () => {
-    let ranNum = Math.floor(Math.random() * ORDERBOOK_LENGTH) + 1
+    let range = 2
+    let ranNum = Math.floor(Math.random() * range) + 1
     try {
-        const orderBookData = await getOrderBook(baseToken, quoteToken)
+        const orderBookData = await tomox.getOrderBook({baseToken, quoteToken})
         if (!orderBookData) {
             return
         }
 
-        let side = (ranNum % 2) ? 'BUY' : 'SELL'
-        const bestBid = orderBookData.asks[ORDERBOOK_LENGTH - 1]
-        const bestAsk = orderBookData.bids[ORDERBOOK_LENGTH - 1]
+        let latestAskPrice = new BigNumber(orderBookData.asks[0].pricepoint)
+        let bestPrice = new BigNumber(parseFloat(await getLatestPrice(pair))).multipliedBy(TOKEN_DECIMALS)
+
+        if (!bestPrice) {
+            let bestBid = orderBookData.asks[ORDERBOOK_LENGTH - 1]
+            let  bestAsk = orderBookData.bids[ORDERBOOK_LENGTH - 1]
+            bestPrice = (ranNum % 2) ? bestAsk.pricepoint
+                : bestBid.pricepoint
+        }
+
+        let side = (bestPrice.isGreaterThanOrEqualTo(latestAskPrice)) ? 'BUY' : 'SELL'
+
+        let price = bestPrice.dividedBy(TOKEN_DECIMALS).multipliedBy(EX_DECIMALS)
+
+        price = (side === 'BUY') ?  minimumPriceStepChange.multipliedBy(ranNum).plus(price)
+            : price.minus(minimumPriceStepChange.multipliedBy(ranNum))
+
+        price = price.dividedBy(EX_DECIMALS).toFixed(FIXP)
+
         let amount = (ranNum * defaultAmount).toFixed(FIXA)
-        let price = (side === 'SELL') ? (bestAsk.pricepoint / TOKEN_DECIMALS).toFixed(FIXP)
-            : (bestBid.pricepoint / TOKEN_DECIMALS).toFixed(FIXP)
-        console.log(price, amount, side)
+
         await createOrder(price, amount, side)
 
     } catch (err) {
@@ -169,7 +179,7 @@ const run = async (p) => {
     quoteToken = config[p].quoteToken
 
     let price = new BigNumber(parseFloat(await getLatestPrice(pair))).multipliedBy(EX_DECIMALS)
-    minimumPriceStepChange = price.dividedBy(1e3)
+    minimumPriceStepChange = price.dividedBy(1e4)
 
     let d = (await tomox.getTokenInfo(quoteToken)).decimals
     TOKEN_DECIMALS = 10 ** parseInt(d || 18)
