@@ -56,16 +56,10 @@ const runMarketMaker = async () => {
         orderBookData.asks.forEach(a => sellPrices.push(new BigNumber(a.pricepoint).dividedBy(TOKEN_DECIMALS).toFixed(FIXP)))
         orderBookData.bids.forEach(b => buyPrices.push(new BigNumber(b.pricepoint).dividedBy(TOKEN_DECIMALS).toFixed(FIXP)))
 
-        let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, askPrice)
-        let sell = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', (buy || {}).nonce, bidPrice)
-        let nonce = (sell || {}).nonce || (buy || {}).nonce
-        let hash = (sell || {}).hash || (buy || {}).hash
+        await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, askPrice)
+        await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', (buy || {}).nonce, bidPrice)
 
-        let isCancel = config[pair].cancel || config.cancel || false
-        if (Math.floor(Math.random() * 4) == 2 && hash && isCancel) {
-            await sleep(4000)
-            await cancel(hash, nonce)
-        }
+        await cancelOrders()
 
     } catch (err) {
         console.log(err)
@@ -92,12 +86,29 @@ const findGoodPrice = (side, latestPrice) => {
     }
 }
 
+const cancelOrders = async () => {
+    let orders = await tomox.getOrders({baseToken, quoteToken})
+    let latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(TOKEN_DECIMALS)
+    let cancelHashes = orders.filter(o => {
+        let price = new BigNumber(o.pricepoint)
+        if (order.side === 'SELL' && price.isGreaterThan(latestPrice.plus(minimumPriceStepChange.multipliedBy(ORDERBOOK_LENGTH)))) {
+            return true
+        }
+        if (order.side === 'BUY' && price.isLessThan(latestPrice.minus(minimumPriceStepChange.multipliedBy(ORDERBOOK_LENGTH)))) {
+            return true
+        }
+        return false
+    })
+    let hashes = cancelHashes.map(c => c.hash)
+    await tomox.cancelManyOrders(hashes)
+}
+
 const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
     let hash = 0
     if (len <= 0) return { nonce,  hash }
 
     try {
-        latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(1e8)
+        latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(EX_DECIMALS)
         let amount = defaultAmount
         let orders = []
         for (let i = 0; i < len; i++) {
@@ -107,7 +118,7 @@ const fillOrderbook = async (len, side, nonce = 0, latestPrice = 0) => {
             let o = {
                 baseToken: baseToken,
                 quoteToken: quoteToken,
-                price: price.dividedBy(1e8).toFixed(FIXP),
+                price: price.dividedBy(EX_DECIMALS).toFixed(FIXP),
                 amount: (amount * ranNum).toFixed(FIXA),
                 side: side,
             }
