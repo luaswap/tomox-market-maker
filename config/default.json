@@ -1,24 +1,14 @@
 {
-    "BTC-TOMO": {
-        "pkey": "0xxxx",
-        "baseName": "bitcoin",
-        "quoteName": "tomochain",
-        "baseToken": "0xBD8b2Fb871F97b2d5F0A1af3bF73619b09174B2A",
-        "quoteToken": "0x0000000000000000000000000000000000000001",
+    "TOMO-BTC": {
+        "pkey": "0x",
+        "baseName": "tomochain",
+        "quoteName": "bitcoin",
+        "baseToken": "0x0000000000000000000000000000000000000001",
+        "quoteToken": "0xBD8b2Fb871F97b2d5F0A1af3bF73619b09174B2A",
         "orderbookLength": 10,
-        "speed": 5000,
-        "cancel": true
-    },
-    "ETH-TOMO": {
-        "pkey": "0xxxx",
-        "baseName": "ethereum",
-        "quoteName": "tomochain",
-        "baseToken": "0x9839B789b09292c175Cc7173337520fE8fd9d8FE",
-        "quoteToken": "0x0000000000000000000000000000000000000001",
-        "price": 3000
+        "speed": 5000
     },
     "relayerUrl": "http://localhost:3001",
     "orderbookLength": 5,
-    "speed": 50000,
-    "cancel": false
+    "speed": 50000
 }
