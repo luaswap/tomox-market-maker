@@ -56,7 +56,7 @@ const runMarketMaker = async () => {
         orderBookData.asks.forEach(a => sellPrices.push(new BigNumber(a.pricepoint).dividedBy(TOKEN_DECIMALS).toFixed(FIXP)))
         orderBookData.bids.forEach(b => buyPrices.push(new BigNumber(b.pricepoint).dividedBy(TOKEN_DECIMALS).toFixed(FIXP)))
 
-        await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, askPrice)
+        let buy = await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.bids.length, 'BUY', 0, askPrice)
         await fillOrderbook(ORDERBOOK_LENGTH - orderBookData.asks.length, 'SELL', (buy || {}).nonce, bidPrice)
 
         await cancelOrders()
@@ -87,14 +87,17 @@ const findGoodPrice = (side, latestPrice) => {
 }
 
 const cancelOrders = async () => {
-    let orders = await tomox.getOrders({baseToken, quoteToken})
+    let orders = (await tomox.getOrders({baseToken, quoteToken})).orders
     let latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(TOKEN_DECIMALS)
-    let cancelHashes = orders.filter(o => {
-        let price = new BigNumber(o.pricepoint)
-        if (order.side === 'SELL' && price.isGreaterThan(latestPrice.plus(minimumPriceStepChange.multipliedBy(ORDERBOOK_LENGTH)))) {
+    let mmp = minimumPriceStepChange.dividedBy(EX_DECIMALS).multipliedBy(TOKEN_DECIMALS)
+    let cancelHashes = orders.filter(order => {
+        let price = new BigNumber(order.pricepoint)
+        if (order.side === 'SELL' && price.isGreaterThan(latestPrice.plus(mmp.multipliedBy(ORDERBOOK_LENGTH)))) {
+            console.log('CANCEL', order.side, order.hash, order.pricepoint, order.amount, order.status)
             return true
         }
-        if (order.side === 'BUY' && price.isLessThan(latestPrice.minus(minimumPriceStepChange.multipliedBy(ORDERBOOK_LENGTH)))) {
+        if (order.side === 'BUY' && price.isLessThan(latestPrice.minus(mmp.multipliedBy(ORDERBOOK_LENGTH)))) {
+            console.log('CANCEL', order.side, order.hash, order.pricepoint, order.amount, order.status)
             return true
         }
         return false
