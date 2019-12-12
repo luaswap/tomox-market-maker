@@ -87,7 +87,7 @@ const findGoodPrice = (side, latestPrice) => {
 }
 
 const cancelOrders = async () => {
-    let orders = (await tomox.getOrders({baseToken, quoteToken})).orders
+    let orders = (await tomox.getOrders({baseToken, quoteToken, status: 'OPEN'})).orders
     let latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(TOKEN_DECIMALS)
     let mmp = minimumPriceStepChange.dividedBy(EX_DECIMALS).multipliedBy(TOKEN_DECIMALS)
     let cancelHashes = orders.filter(order => {
