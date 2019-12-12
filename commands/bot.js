@@ -9,7 +9,7 @@ let FIXA = 5 // amount decimals
 let FIXP = 7 // price decimals
 let ORDERBOOK_LENGTH = config.get('orderbookLength') // number of order in orderbook
 let tomox = new TomoX()
-let pair = 'BTC-TOMO'
+let pair = 'TOMO-BTC'
 let baseToken = config.get(`${pair}.baseToken`)
 let quoteToken = config.get(`${pair}.quoteToken`)
 let TOKEN_DECIMALS = 1e18
@@ -91,6 +91,7 @@ const cancelOrders = async () => {
     let latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(TOKEN_DECIMALS)
     let mmp = minimumPriceStepChange.dividedBy(EX_DECIMALS).multipliedBy(TOKEN_DECIMALS)
     let cancelHashes = orders.filter(order => {
+        if (order.status !== 'OPEN') return false
         let price = new BigNumber(order.pricepoint)
         if (order.side === 'SELL' && price.isGreaterThan(latestPrice.plus(mmp.multipliedBy(ORDERBOOK_LENGTH)))) {
             console.log('CANCEL', order.side, order.hash, order.pricepoint, order.amount, order.status)
