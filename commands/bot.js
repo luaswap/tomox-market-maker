@@ -13,6 +13,7 @@ let pair = 'TOMO-BTC'
 let baseToken = config.get(`${pair}.baseToken`)
 let quoteToken = config.get(`${pair}.quoteToken`)
 let TOKEN_DECIMALS = 1e18
+let BASE_TOKEN_DECIMALS = 1e18
 let EX_DECIMALS = 1e8
 
 let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
@@ -177,7 +178,7 @@ const match = async (orderBookData) => {
             await createOrder(price, amount, side)
         } else {
             price = price.dividedBy(TOKEN_DECIMALS).toFixed(FIXP)
-            amount = amount.dividedBy(TOKEN_DECIMALS).toFixed(FIXA)
+            amount = amount.dividedBy(BASE_TOKEN_DECIMALS).toFixed(FIXA)
             await createOrder(price, amount, side)
         }
 
@@ -188,7 +189,7 @@ const match = async (orderBookData) => {
 }
 
 const run = async (p) => {
-    tomox = new TomoX(config.get('relayerUrl'), config[p].pkey)
+    tomox = new TomoX(config.get('relayerUrl'), '', config[p].pkey)
     pair = p || 'BTC-TOMO'
     ORDERBOOK_LENGTH = config[p].orderbookLength || config.get('orderbookLength') || 5
     baseToken = config[p].baseToken
@@ -199,6 +200,8 @@ const run = async (p) => {
 
     let d = (await tomox.getTokenInfo(quoteToken)).decimals
     TOKEN_DECIMALS = 10 ** parseInt(d || 18)
+    d = (await tomox.getTokenInfo(baseToken)).decimals
+    BASE_TOKEN_DECIMALS = 10 ** parseInt(d || 18)
 
     if (pair.endsWith('BTC')) {
         defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(EX_DECIMALS).multipliedBy(0.001).toFixed(FIXA))
