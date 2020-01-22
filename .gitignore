@@ -1,5 +1,6 @@
 .env
 .eslintcache
+testnet.json
 node_modules/
 *.sw*
 *.log
