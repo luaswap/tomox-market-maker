@@ -24,6 +24,8 @@ const createOrder = async (price, amount, side) => {
     let prec = calcPrecision(price)
     price = new BigNumber(price).toFixed(prec.pricePrecision)
     amount = new BigNumber(amount).toFixed(prec.amountPrecision)
+    FIXP = prec.pricePrecision
+    FIXA = prec.amountPrecision
     let o = await tomox.createOrder({
         baseToken: baseToken,
         quoteToken: quoteToken,
@@ -175,13 +177,16 @@ const match = async (orderBookData) => {
             }
         })
 
+        let ROUNDING_MODE = (side === 'SELL') ? 1 : 0
+
         if (amount.isEqualTo(0)) {
             price = bestPrice.dividedBy(TOKEN_DECIMALS).toFixed(FIXP)
             amount = defaultAmount.toFixed(FIXA)
             await createOrder(price, amount, side)
         } else {
-            price = price.dividedBy(TOKEN_DECIMALS).toFixed(FIXP)
+            price = price.dividedBy(TOKEN_DECIMALS).toFixed(FIXP, ROUNDING_MODE)
             amount = amount.dividedBy(BASE_TOKEN_DECIMALS).toFixed(FIXA)
+
             await createOrder(price, amount, side)
         }
 
