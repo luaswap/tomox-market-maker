@@ -171,7 +171,7 @@ const match = async (orderBookData) => {
             let p = new BigNumber(bid.pricepoint)
             let a = new BigNumber(bid.amount)
             if (p.isGreaterThanOrEqualTo(bestPrice) &&
-                a.isGreaterThanOrEqualTo(new BigNumber(1).multipliedBy(BASE_TOKEN_DECIMALS))
+                a.dividedBy(BASE_TOKEN_DECIMALS).multipliedBy(10 ** FIXA).isGreaterThanOrEqualTo(new BigNumber(1))
             ) {
                 side = 'SELL'
                 price = p
