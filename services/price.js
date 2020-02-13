@@ -28,7 +28,7 @@ const getLatestPrice = async (p = false) => {
             return response.data.price
 
         } else {
-            const response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}${quoteSymbol.toUpperCase}`)
+            const response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}${quoteSymbol.toUpperCase()}`)
             return response.data.price
         }
     } catch (err) {
