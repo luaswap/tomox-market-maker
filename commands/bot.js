@@ -1,4 +1,4 @@
-const { getLatestPrice } = require('../services/coingecko')
+const { getLatestPrice } = require('../services/price')
 const TomoX = require('tomoxjs')
 const BigNumber = require('bignumber.js')
 const config = require('config')

@@ -21,9 +21,15 @@ const getLatestPrice = async (p = false) => {
             } else {
                 return (1/response.data[quoteName].btc) * response.data[baseName].btc
             }
+        }
+
+        if ( quoteSymbol === 'usd' ) {
+            const response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}USDT`)
+            return response.data.price
+
         } else {
-            const response = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${baseName},tomochain&vs_currencies=${quoteSymbol}`)
-            return  response.data[baseName][quoteSymbol]
+            const response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}${quoteSymbol.toUpperCase}`)
+            return response.data.price
         }
     } catch (err) {
         console.log(err)
