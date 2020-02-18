@@ -19,6 +19,7 @@ let EX_DECIMALS = 1e8
 let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
 let sellPrices = []
 let buyPrices = []
+let isFirstOrder = true
 
 const createOrder = async (price, amount, side) => {
     let prec = calcPrecision(price)
@@ -38,8 +39,6 @@ const createOrder = async (price, amount, side) => {
 }
 
 const runMarketMaker = async () => {
-    let hash = false
-    let nonce = 0
     try {
         const orderBookData = await tomox.getOrderBook({baseToken, quoteToken})
         if (!orderBookData) {
@@ -156,6 +155,10 @@ const match = async (orderBookData) => {
         let price = new BigNumber(0)
         let amount = new BigNumber(0)
         let side = 'BUY'
+
+        let prec = calcPrecision(bestPrice)
+        FIXP = prec.pricePrecision
+        FIXA = prec.amountPrecision
 
         orderBookData.asks.forEach(ask => {
             let p = new BigNumber(ask.pricepoint)
