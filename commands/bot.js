@@ -151,12 +151,13 @@ const cancel = async (hash, nonce) => {
 
 const match = async (orderBookData) => {
     try {
-        let bestPrice = new BigNumber(new BigNumber(parseFloat(await getLatestPrice(pair))).toFixed(FIXP)).multipliedBy(TOKEN_DECIMALS)
+        let remotePrice = parseFloat(await getLatestPrice(pair))
+        let bestPrice = new BigNumber(new BigNumber(remotePrice).toFixed(FIXP)).multipliedBy(TOKEN_DECIMALS)
         let price = new BigNumber(0)
         let amount = new BigNumber(0)
         let side = 'BUY'
 
-        let prec = calcPrecision(bestPrice)
+        let prec = calcPrecision(remotePrice)
         FIXP = prec.pricePrecision
         FIXA = prec.amountPrecision
 
