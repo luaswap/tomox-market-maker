@@ -160,7 +160,9 @@ const match = async (orderBookData) => {
         orderBookData.asks.forEach(ask => {
             let p = new BigNumber(ask.pricepoint)
             let a = new BigNumber(ask.amount)
-            if (p.isLessThanOrEqualTo(bestPrice)) {
+            if (p.isLessThanOrEqualTo(bestPrice) &&
+                a.dividedBy(BASE_TOKEN_DECIMALS).multipliedBy(10 ** FIXA).isGreaterThanOrEqualTo(new BigNumber(1))
+            ) {
                 side = 'BUY'
                 price = p
                 amount = amount.plus(a)
