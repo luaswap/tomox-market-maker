@@ -157,10 +157,6 @@ const match = async (orderBookData) => {
         let amount = new BigNumber(0)
         let side = 'BUY'
 
-        let prec = calcPrecision(remotePrice)
-        FIXP = prec.pricePrecision
-        FIXA = prec.amountPrecision
-
         orderBookData.asks.forEach(ask => {
             let p = new BigNumber(ask.pricepoint)
             let a = new BigNumber(ask.amount)
@@ -211,7 +207,8 @@ const run = async (p) => {
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
 
-    let price = new BigNumber(parseFloat(await getLatestPrice(pair))).multipliedBy(EX_DECIMALS)
+    let remotePrice = parseFloat(await getLatestPrice(pair))
+    let price = new BigNumber(remotePrice).multipliedBy(EX_DECIMALS)
     minimumPriceStepChange = price.dividedBy(1e4)
 
     let d = (await tomox.getTokenInfo(quoteToken)).decimals
@@ -226,13 +223,9 @@ const run = async (p) => {
         defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(EX_DECIMALS).multipliedBy(100).toFixed(FIXA))
     }
 
-    if (defaultAmount > 1) {
-        FIXA = 2
-    }
-
-    if (minimumPriceStepChange.isGreaterThan(1e+8)) {
-        FIXP = 2
-    }
+    let prec = calcPrecision(remotePrice)
+    FIXP = prec.pricePrecision
+    FIXA = prec.amountPrecision
 
     let speed = config[pair].speed || config.speed || 50000
     while(true) {
