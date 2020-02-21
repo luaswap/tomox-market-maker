@@ -94,17 +94,18 @@ const cancelOrders = async (nonce) => {
         if (order.status !== 'OPEN') return false
         let price = new BigNumber(order.pricepoint)
         if (order.side === 'SELL' && price.isGreaterThan(latestPrice.plus(mmp.multipliedBy(ORDERBOOK_LENGTH)))) {
-            console.log('CANCEL', order.side, order.hash, order.pricepoint, order.amount, order.status)
             return true
         }
         if (order.side === 'BUY' && price.isLessThan(latestPrice.minus(mmp.multipliedBy(ORDERBOOK_LENGTH)))) {
-            console.log('CANCEL', order.side, order.hash, order.pricepoint, order.amount, order.status)
             return true
         }
         return false
     })
     let hashes = cancelHashes.map(c => c.hash)
-    await tomox.cancelManyOrders(hashes, nonce || 0)
+    let ret = await tomox.cancelManyOrders(hashes, nonce || 0)
+    ret.forEach(o => {
+        console.log('CANCEL', o.side, o.pair, o.price, o.amount, o.hash, o.nonce)
+    })
 }
 
 const fillOrderbook = async (len, side, nonce = 0) => {
