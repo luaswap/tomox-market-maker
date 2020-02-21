@@ -34,7 +34,7 @@ const createOrder = async (price, amount, side) => {
         amount: amount,
         side: side
     })
-    console.log(side, pair, price, amount, o.hash, o.nonce)
+    console.log(`${side} pair=${pair} price=${price} amount=${amount} hash=${o.hash} nonce=${o.nonce}`)
     return o
 }
 
@@ -104,7 +104,7 @@ const cancelOrders = async (nonce) => {
     let hashes = cancelHashes.map(c => c.hash)
     let ret = await tomox.cancelManyOrders(hashes, nonce || 0)
     ret.forEach(o => {
-        console.log('CANCEL', o.side, o.pair, o.price, o.amount, o.hash, o.nonce)
+        console.log('CANCEL', `orderHash=${o.orderHash} orderId=${o.orderId} hash=${o.hash} nonce=${o.nonce}`)
     })
 }
 
