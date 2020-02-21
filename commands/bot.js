@@ -104,7 +104,7 @@ const cancelOrders = async (nonce) => {
     let hashes = cancelHashes.map(c => c.hash)
     let ret = await tomox.cancelManyOrders(hashes, nonce || 0)
     ret.forEach(o => {
-        console.log('CANCEL', `orderHash=${o.orderHash} orderId=${o.orderId} hash=${o.hash} nonce=${o.nonce}`)
+        console.log('CANCEL', `orderHash=${o.orderHash} orderId=${o.orderID} hash=${o.hash} nonce=${o.nonce}`)
     })
 }
 
