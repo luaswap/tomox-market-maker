@@ -1,6 +1,8 @@
 const axios = require('axios')
 const config = require('config')
 
+const gPrice = {}
+
 const getLatestPrice = async (p = false) => {
     try {
         if (p && (config[p] || {}).price) {
@@ -20,26 +22,26 @@ const getLatestPrice = async (p = false) => {
             let tomoPrice = response.data.price
 
             if (baseSymbol === 'btc') {
-                return 1/tomoPrice
+                gPrice[p] = 1/tomoPrice
             } else {
                 response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}BTC`)
                 let tokenPrice = response.data.price
 
-                return (1/tomoPrice) * tokenPrice
+                gPrice[p] = (1/tomoPrice) * tokenPrice
             }
         }
 
         if ( quoteSymbol === 'usd' ) {
             const response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}USDT`)
-            return response.data.price
+            gPrice[p] = response.data.price
 
         } else {
             const response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}${quoteSymbol.toUpperCase()}`)
-            return response.data.price
+            gPrice[p] = response.data.price
         }
     } catch (err) {
         console.log(err)
-        return null
     }
+    return gPrice[p]
 }
 module.exports = { getLatestPrice }
