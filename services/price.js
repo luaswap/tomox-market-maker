@@ -14,12 +14,18 @@ const getLatestPrice = async (p = false) => {
         if (quoteSymbol === 'usdt') {
             quoteSymbol = 'usd'
         }
+
         if (quoteSymbol === 'tomo') {
-            const response = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${baseName},tomochain&vs_currencies=btc`)
+            let response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=TOMOBTC`)
+            let tomoPrice = response.data.price
+
             if (baseSymbol === 'btc') {
-                return 1/response.data[quoteName].btc
+                return 1/tomoPrice
             } else {
-                return (1/response.data[quoteName].btc) * response.data[baseName].btc
+                response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}BTC`)
+                let tokenPrice = response.data.price
+
+                return (1/tomoPrice) * tokenPrice
             }
         }
 

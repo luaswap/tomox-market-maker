@@ -137,7 +137,7 @@ const fillOrderbook = async (len, side, nonce = 0) => {
         orders.forEach((or, k) => {
             hash = ret[k].hash
             nonce = ret[k].nonce
-            console.log(side, pair, or.price, or.amount, ret[k].hash, ret[k].nonce)
+            console.log(`${side} pair=${pair} price=${or.price} amount=${or.amount} hash=${ret[k].hash} nonce=${ret[k].nonce}`)
         })
         return { nonce:  parseInt(nonce) + 1, hash: hash }
     } catch (err) {
