@@ -29,6 +29,7 @@ const getLatestPrice = async (p = false) => {
 
                 gPrice[p] = (1/tomoPrice) * tokenPrice
             }
+            return gPrice[p]
         }
 
         if ( quoteSymbol === 'usd' ) {
