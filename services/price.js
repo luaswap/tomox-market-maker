@@ -3,6 +3,9 @@ const config = require('config')
 
 const gPrice = {}
 
+const httpClient = axios.create()
+client.defaults.timeout = 2500
+
 const getLatestPrice = async (p = false) => {
     try {
         if (p && (config[p] || {}).price) {
@@ -18,13 +21,13 @@ const getLatestPrice = async (p = false) => {
         }
 
         if (quoteSymbol === 'tomo') {
-            let response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=TOMOBTC`)
+            let response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=TOMOBTC`)
             let tomoPrice = response.data.price
 
             if (baseSymbol === 'btc') {
                 gPrice[p] = 1/tomoPrice
             } else {
-                response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}BTC`)
+                response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}BTC`)
                 let tokenPrice = response.data.price
 
                 gPrice[p] = (1/tomoPrice) * tokenPrice
@@ -33,11 +36,11 @@ const getLatestPrice = async (p = false) => {
         }
 
         if ( quoteSymbol === 'usd' ) {
-            const response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}USDT`)
+            const response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}USDT`)
             gPrice[p] = response.data.price
 
         } else {
-            const response = await axios.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}${quoteSymbol.toUpperCase()}`)
+            const response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}${quoteSymbol.toUpperCase()}`)
             gPrice[p] = response.data.price
         }
     } catch (err) {
