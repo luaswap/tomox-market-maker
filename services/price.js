@@ -4,7 +4,7 @@ const config = require('config')
 const gPrice = {}
 
 const httpClient = axios.create()
-client.defaults.timeout = 2500
+httpClient.defaults.timeout = 2500
 
 const getLatestPrice = async (p = false) => {
     try {
