@@ -5,15 +5,34 @@ const config = require('config')
 let lendingToken = ''
 let term = ''
 let pair = 'USD-60'
+let tomox = new TomoX()
 
 let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
+
+const createOrder = async (side, interest, quantity) => {
+    let o = await tomox.createLending({
+        collateralToken: config[pair].collateralToken,
+        lendingToken: config[pair].lendingToken,
+        quantity: String(quantity),
+        interest: String(interest),
+        term: String(config[pair].term),
+        side: side
+    })
+
+    console.log(`${side} pair=${pair} rate=${interest} amount=${quantity} hash=${o.hash} nonce=${o.nonce}`)
+    return o
+}
 
 const runMarketMaker = async () => {
     try {
         const orderBookData = await tomox.getLendingOrderBook({
             term: config[pair].term, lendingToken: config[pair].lendingToken
         })
-        console.log(orderBookData)
+        let side = (Math.floor(Math.random() * 10) % 2 === 0) ? 'BORROW' : 'INVEST'
+        let interest = Math.floor(Math.random() * (12 - 6 + 1)) + 6
+        let quantity = Math.floor(Math.random() * (2000 - 1000 + 1)) + 1000
+
+        let o = await createOrder(side, interest, quantity)
 
     } catch (err) {
         console.log(err)
@@ -30,6 +49,5 @@ const run = async (p) => {
         await sleep(speed)
     }
 }
-
 
 module.exports = { run }
