@@ -29,7 +29,7 @@ const runMarketMaker = async () => {
             term: config[pair].term, lendingToken: config[pair].lendingToken
         })
         let side = (Math.floor(Math.random() * 10) % 2 === 0) ? 'BORROW' : 'INVEST'
-        let interest = Math.floor(Math.random() * (12 - 6 + 1)) + 6
+        let interest = (Math.random() * (12.00 - 6.00) + 6.00).toFixed(2)
         let quantity = Math.floor(Math.random() * (2000 - 1000 + 1)) + 1000
 
         let o = await createOrder(side, interest, quantity)
