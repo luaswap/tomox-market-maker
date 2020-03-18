@@ -12,7 +12,7 @@
     "bignumber.js": "^9.0.0",
     "commander": "^3.0.2",
     "config": "^3.2.3",
-    "tomoxjs": "^0.3.3"
+    "tomoxjs": "^0.4.2"
   },
   "devDependencies": {
     "eslint": "^6.5.1"
