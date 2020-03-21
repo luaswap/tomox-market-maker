@@ -1,4 +1,4 @@
-const { getLatestPrice } = require('../services/price')
+const { getLatestPrice, getUSDPrice } = require('../services/price')
 const TomoX = require('tomoxjs')
 const BigNumber = require('bignumber.js')
 const config = require('config')
@@ -210,23 +210,18 @@ const run = async (p) => {
 
     let remotePrice = parseFloat(await getLatestPrice(pair))
     let price = new BigNumber(remotePrice).multipliedBy(EX_DECIMALS)
-    minimumPriceStepChange = price.dividedBy(1e4)
+    minimumPriceStepChange = price.dividedBy(1e3)
 
     let d = (await tomox.getTokenInfo(quoteToken)).decimals
     TOKEN_DECIMALS = 10 ** parseInt(d || 18)
     d = (await tomox.getTokenInfo(baseToken)).decimals
     BASE_TOKEN_DECIMALS = 10 ** parseInt(d || 18)
 
-    if (pair.endsWith('BTC')) {
-        defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(EX_DECIMALS).multipliedBy(0.001).toFixed(FIXA))
-        minimumPriceStepChange = price.dividedBy(1e2)
-    } else {
-        defaultAmount = parseFloat(new BigNumber(1).dividedBy(price).multipliedBy(EX_DECIMALS).multipliedBy(100).toFixed(FIXA))
-    }
-
     let prec = calcPrecision(remotePrice)
     FIXP = prec.pricePrecision
     FIXA = prec.amountPrecision
+
+    defaultAmount = parseFloat(new BigNumber(config.volume).dividedBy(usdPrice).multipliedBy(EX_DECIMALS).toFixed(FIXA))
 
     let speed = config[pair].speed || config.speed || 50000
     while(true) {

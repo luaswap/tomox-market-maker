@@ -17,5 +17,6 @@
     },
     "relayerUrl": "http://localhost:3001",
     "orderbookLength": 5,
-    "speed": 50000
+    "speed": 50000,
+    "volume": 10
 }

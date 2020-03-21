@@ -2,6 +2,7 @@ const axios = require('axios')
 const config = require('config')
 
 const gPrice = {}
+const gUSDPrice = {}
 
 const httpClient = axios.create()
 httpClient.defaults.timeout = 2500
@@ -11,8 +12,6 @@ const getLatestPrice = async (p = false) => {
         if (p && (config[p] || {}).price) {
             return config[p].price
         }
-        let baseName = config[p].baseName
-        let quoteName = config[p].quoteName
         let arr = p.split('-')
         let baseSymbol = arr[0].toLowerCase()
         let quoteSymbol = arr[1].toLowerCase()
@@ -48,4 +47,26 @@ const getLatestPrice = async (p = false) => {
     }
     return gPrice[p]
 }
-module.exports = { getLatestPrice }
+
+const getUSDPrice = async (p = false) => {
+    let baseSymbol = 'TOMO'
+    try {
+        if (p && (config[p] || {}).price) {
+            return config[p].price
+        }
+
+        baseSymbol = arr[0].toUpperCase()
+
+        if (baseSymbol != 'USDT') {
+            response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol}USDT`)
+            let tokenPrice = response.data.price
+
+            gUSDPrice[baseSymbol] = tokenPrice
+        }
+    } catch (err) {
+        console.log(err)
+    }
+    return gUSDPrice[baseSymbol]
+}
+
+module.exports = { getLatestPrice, getUSDPrice }
