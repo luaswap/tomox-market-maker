@@ -162,7 +162,7 @@ const match = async (orderBookData) => {
             let p = new BigNumber(ask.pricepoint)
             let a = new BigNumber(ask.amount)
             if (p.isLessThanOrEqualTo(bestPrice) &&
-                a.dividedBy(BASE_TOKEN_DECIMALS).multipliedBy(10 ** FIXA).isGreaterThanOrEqualTo(new BigNumber(1))
+                a.dividedBy(BASE_TOKEN_DECIMALS).multipliedBy(10 ** FIXA).isGreaterThan(new BigNumber(1))
             ) {
                 side = 'BUY'
                 price = p
@@ -174,7 +174,7 @@ const match = async (orderBookData) => {
             let p = new BigNumber(bid.pricepoint)
             let a = new BigNumber(bid.amount)
             if (p.isGreaterThanOrEqualTo(bestPrice) &&
-                a.dividedBy(BASE_TOKEN_DECIMALS).multipliedBy(10 ** FIXA).isGreaterThanOrEqualTo(new BigNumber(1))
+                a.dividedBy(BASE_TOKEN_DECIMALS).multipliedBy(10 ** FIXA).isGreaterThan(new BigNumber(1))
             ) {
                 side = 'SELL'
                 price = p
