@@ -55,6 +55,7 @@ const getUSDPrice = async (p = false) => {
             return config[p].price
         }
 
+        let arr = p.split('-')
         baseSymbol = arr[0].toUpperCase()
 
         if (baseSymbol != 'USDT') {

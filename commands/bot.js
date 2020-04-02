@@ -210,6 +210,7 @@ const run = async (p) => {
 
     let remotePrice = parseFloat(await getLatestPrice(pair))
     let price = new BigNumber(remotePrice).multipliedBy(EX_DECIMALS)
+    let usdPrice = parseFloat(await getUSDPrice(pair))
     minimumPriceStepChange = price.dividedBy(1e3)
 
     let d = (await tomox.getTokenInfo(quoteToken)).decimals
@@ -221,7 +222,7 @@ const run = async (p) => {
     FIXP = prec.pricePrecision
     FIXA = prec.amountPrecision
 
-    defaultAmount = parseFloat(new BigNumber(config.volume).dividedBy(usdPrice).multipliedBy(EX_DECIMALS).toFixed(FIXA))
+    defaultAmount = parseFloat(new BigNumber(config.volume).dividedBy(usdPrice).toFixed(FIXA))
 
     let speed = config[pair].speed || config.speed || 50000
     while(true) {
