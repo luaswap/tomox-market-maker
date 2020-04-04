@@ -1,6 +1,7 @@
 const TomoX = require('tomoxjs')
 const BigNumber = require('bignumber.js')
 const config = require('config')
+const { getUSDPrice } = require('../services/price')
 
 let lendingToken = ''
 let term = ''
@@ -28,8 +29,9 @@ const runMarketMaker = async () => {
         const orderBookData = await tomox.getLendingOrderBook({
             term: config[pair].term, lendingToken: config[pair].lendingToken
         })
+        let tomoPrice = parseFloat(await getUSDPrice('TOMO-USD'))
         let side = (Math.floor(Math.random() * 10) % 2 === 0) ? 'BORROW' : 'INVEST'
-        let interest = (Math.random() * (12.00 - 6.00) + 6.00).toFixed(2)
+        let interest = ((10 * tomoPrice) + 6.00).toFixed(2)
         let quantity = Math.floor(Math.random() * (2000 - 1000 + 1)) + 1000
 
         let o = await createOrder(side, interest, quantity)
