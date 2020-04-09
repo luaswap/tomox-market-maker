@@ -17,5 +17,5 @@
     "orderbookLength": 5,
     "speed": 50000,
     "volume": 10,
-    "lendingVolume": 1000
+    "lendingVolume": 500
 }
