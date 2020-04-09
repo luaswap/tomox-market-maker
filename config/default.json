@@ -1,8 +1,6 @@
 {
     "TOMO-BTC": {
         "pkey": "0x",
-        "baseName": "tomochain",
-        "quoteName": "bitcoin",
         "baseToken": "0x0000000000000000000000000000000000000001",
         "quoteToken": "0xBD8b2Fb871F97b2d5F0A1af3bF73619b09174B2A",
         "orderbookLength": 10,
@@ -18,5 +16,6 @@
     "relayerUrl": "http://localhost:3001",
     "orderbookLength": 5,
     "speed": 50000,
-    "volume": 10
+    "volume": 10,
+    "lendingVolume": 1000
 }

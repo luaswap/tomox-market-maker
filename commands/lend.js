@@ -6,6 +6,8 @@ const { getUSDPrice } = require('../services/price')
 let lendingToken = ''
 let term = ''
 let pair = 'USD-60'
+let defaultAmount = 1
+let FIXA = 2 // amount decimals
 let tomox = new TomoX()
 
 let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
@@ -32,7 +34,7 @@ const runMarketMaker = async () => {
         let tomoPrice = parseFloat(await getUSDPrice('TOMO-USD'))
         let side = (Math.floor(Math.random() * 10) % 2 === 0) ? 'BORROW' : 'INVEST'
         let interest = ((10 * tomoPrice) + 6.00).toFixed(2)
-        let quantity = Math.floor(Math.random() * (2000 - 1000 + 1)) + 1000
+        let quantity = (defaultAmount * (1 + Math.random())).toFixed(FIXA)
 
         let o = await createOrder(side, interest, quantity)
 
@@ -42,6 +44,8 @@ const runMarketMaker = async () => {
 }
 
 const run = async (p) => {
+    let usdPrice = parseFloat(await getUSDPrice(p))
+    defaultAmount = parseFloat(new BigNumber(config.lendingVolume).dividedBy(usdPrice).toFixed(FIXA))
     tomox = new TomoX(config.get('relayerUrl'), '', config[p].pkey)
     pair = p || 'USD-60'
 

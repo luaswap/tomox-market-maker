@@ -58,11 +58,13 @@ const getUSDPrice = async (p = false) => {
         let arr = p.split('-')
         baseSymbol = arr[0].toUpperCase()
 
-        if (baseSymbol != 'USDT') {
+        if (baseSymbol != 'USDT' && baseSymbol != 'USD') {
             response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol}USDT`)
             let tokenPrice = response.data.price
 
             gUSDPrice[baseSymbol] = tokenPrice
+        } else {
+            gUSDPrice[baseSymbol] = 1
         }
     } catch (err) {
         console.log(err)
