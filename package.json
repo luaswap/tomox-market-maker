@@ -12,6 +12,7 @@
     "bignumber.js": "^9.0.0",
     "commander": "^3.0.2",
     "config": "^3.2.3",
+    "tomojs": "^1.1.1",
     "tomoxjs": "^0.5.1"
   },
   "devDependencies": {

@@ -13,6 +13,13 @@
         "collateralToken": "0x9839B789b09292c175Cc7173337520fE8fd9d8FE",
         "speed": 5000
     },
+    "priceFeeder": {
+        "pkey": "0xxx",
+        "lendingToken": "0x260eD86C808f0de23721Abf47039C8dA53C0be2f",
+        "collateralToken": "0x716EE8E4e1A64b5E52fC3a2889c52cbA8F58523F",
+        "rpc": "https://rpc.devnet.tomochain.com",
+        "speed": 1800000
+    },
     "relayerUrl": "http://localhost:3001",
     "orderbookLength": 5,
     "speed": 50000,
