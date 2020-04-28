@@ -4,6 +4,7 @@ const commander = require('commander')
 const bot = require('./commands/bot')
 const lend = require('./commands/lend')
 const price = require('./commands/price')
+const wall = require('./commands/wall')
 
 commander
     .version('1.0.0')
@@ -23,8 +24,14 @@ commander
 
 commander
     .command('price')
+    .action(async () => {
+        await price.run()
+    })
+
+commander
+    .command('wall <pair>')
     .action(async (pair) => {
-        await price.run(pair)
+        await wall.run(pair)
     })
 
 commander.parse(process.argv)
