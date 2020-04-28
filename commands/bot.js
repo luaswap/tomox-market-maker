@@ -41,7 +41,7 @@ const createOrder = async (price, amount, side) => {
 
 const runMarketMaker = async () => {
     try {
-        const orderBookData = await tomox.getOrderBook({baseToken, quoteToken})
+        const orderBookData = await tomox.getOrderBook({ baseToken, quoteToken })
         if (!orderBookData) {
             return
         }
@@ -88,7 +88,7 @@ const findGoodPrice = (side, latestPrice) => {
 }
 
 const cancelOrders = async (nonce) => {
-    let orders = (await tomox.getOrders({baseToken, quoteToken, status: 'OPEN'})).orders
+    let orders = (await tomox.getOrders({ baseToken, quoteToken, status: 'OPEN' })).orders
     let latestPrice = new BigNumber(await getLatestPrice(pair)).multipliedBy(TOKEN_DECIMALS)
     let mmp = minimumPriceStepChange.dividedBy(EX_DECIMALS).multipliedBy(TOKEN_DECIMALS)
     let cancelHashes = orders.filter(order => {

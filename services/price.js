@@ -39,7 +39,9 @@ const getLatestPrice = async (p = false) => {
             gPrice[p] = response.data.price
 
         } else {
-            const response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}${quoteSymbol.toUpperCase()}`)
+            const response = await httpClient.get(
+                `https://www.binance.com/api/v3/ticker/price?symbol=${baseSymbol.toUpperCase()}${quoteSymbol.toUpperCase()}`
+            )
             gPrice[p] = response.data.price
         }
     } catch (err) {
