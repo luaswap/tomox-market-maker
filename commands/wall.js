@@ -65,7 +65,7 @@ const run = async (p) => {
 
         if (first === true || ran !== 0) {
             first = false
-            let b = Math.random() >= 0.5
+            let b = (Math.random() >= 0.5)
             let side = b ? 'BUY' : 'SELL'
 
             price = b ? price.multipliedBy(2) : price.dividedBy(2)
