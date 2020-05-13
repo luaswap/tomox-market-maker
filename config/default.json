@@ -20,6 +20,7 @@
         "rpc": "https://rpc.devnet.tomochain.com",
         "speed": 1800000
     },
+    "wallPKey": "0xxx",
     "relayerUrl": "http://localhost:3001",
     "orderbookLength": 5,
     "speed": 50000,

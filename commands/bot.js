@@ -215,9 +215,9 @@ const run = async (p) => {
     minimumPriceStepChange = price.dividedBy(1e3)
 
     let d = (await tomox.getTokenInfo(quoteToken)).decimals
-    TOKEN_DECIMALS = 10 ** parseInt(d || 18)
+    TOKEN_DECIMALS = 10 ** parseInt(d)
     d = (await tomox.getTokenInfo(baseToken)).decimals
-    BASE_TOKEN_DECIMALS = 10 ** parseInt(d || 18)
+    BASE_TOKEN_DECIMALS = 10 ** parseInt(d)
 
     let prec = calcPrecision(remotePrice)
     FIXP = prec.pricePrecision
