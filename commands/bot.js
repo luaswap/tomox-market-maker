@@ -208,11 +208,12 @@ const run = async (p) => {
     ORDERBOOK_LENGTH = config[p].orderbookLength || config.get('orderbookLength') || 5
     baseToken = config[p].baseToken
     quoteToken = config[p].quoteToken
+    defaultVolume = config[p].volume || config.volume
 
     let remotePrice = parseFloat(await getLatestPrice(pair))
     let price = new BigNumber(remotePrice).multipliedBy(EX_DECIMALS)
     let usdPrice = parseFloat(await getUSDPrice(pair))
-    minimumPriceStepChange = price.dividedBy(1e3)
+    minimumPriceStepChange = price.dividedBy(1e2)
 
     let d = (await tomox.getTokenInfo(quoteToken)).decimals
     TOKEN_DECIMALS = 10 ** parseInt(d)
@@ -223,7 +224,7 @@ const run = async (p) => {
     FIXP = prec.pricePrecision
     FIXA = prec.amountPrecision
 
-    defaultAmount = parseFloat(new BigNumber(config.volume).dividedBy(usdPrice).toFixed(FIXA))
+    defaultAmount = parseFloat(new BigNumber(defaultVolume).dividedBy(usdPrice).toFixed(FIXA))
 
     let speed = config[pair].speed || config.speed || 50000
     while(true) {
