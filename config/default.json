@@ -25,5 +25,7 @@
     "orderbookLength": 5,
     "speed": 50000,
     "volume": 10,
-    "lendingVolume": 500
+    "lendingVolume": 500,
+    "step": 0.01,
+    "lendStep": 0.1
 }

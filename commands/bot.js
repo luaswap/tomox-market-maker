@@ -213,7 +213,8 @@ const run = async (p) => {
     let remotePrice = parseFloat(await getLatestPrice(pair))
     let price = new BigNumber(remotePrice).multipliedBy(EX_DECIMALS)
     let usdPrice = parseFloat(await getUSDPrice(pair))
-    minimumPriceStepChange = price.dividedBy(1e2)
+    let step = config[p].step || config.step || 0.01
+    minimumPriceStepChange = price.multipliedBy(step)
 
     let d = (await tomox.getTokenInfo(quoteToken)).decimals
     TOKEN_DECIMALS = 10 ** parseInt(d)

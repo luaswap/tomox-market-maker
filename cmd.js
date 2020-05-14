@@ -3,6 +3,7 @@
 const commander = require('commander')
 const bot = require('./commands/bot')
 const lend = require('./commands/lend')
+const lendBot = require('./commands/lendBot')
 const price = require('./commands/price')
 const wall = require('./commands/wall')
 
@@ -20,6 +21,12 @@ commander
     .command('lend <pair>')
     .action(async (pair) => {
         await lend.run(pair)
+    })
+
+commander
+    .command('lendBot <pair>')
+    .action(async (pair) => {
+        await lendBot.run(pair)
     })
 
 commander
