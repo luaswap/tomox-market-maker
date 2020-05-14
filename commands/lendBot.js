@@ -38,7 +38,7 @@ const runMarketMaker = async () => {
         if (orderBookData.borrow.length < lendOrderBookLength) {
             let length = orderBookData.borrow.length
             let side = 'BORROW' 
-            let interest = (defaultInterest + (defaultStep * (length + 1) * (1 + Math.random()))).toFixed(FIXI)
+            let interest = (defaultInterest - (defaultStep * (length + 1) * (1 + Math.random()))).toFixed(FIXI)
             let quantity = (defaultAmount * (1 + Math.random())).toFixed(FIXA)
 
             let o = await createOrder(side, interest, quantity)
