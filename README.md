@@ -1,6 +1,8 @@
 # tomox-market-maker
 _Simple market maker to create liquidity/volume for TomoX_
 
+**NOTE: we only use this script in the development environment, use it with your own risk**
+
 
 ## Install
 ```
