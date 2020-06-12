@@ -19,8 +19,8 @@ const getLatestPrice = async (p = false) => {
             quoteSymbol = 'usd'
         }
 
-        if (quoteSymbol === 'tomo') {
-            let response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=TOMOBTC`)
+        if ((quoteSymbol === 'tomo') || (quoteSymbol === 'eth')) {
+            let response = await httpClient.get(`https://www.binance.com/api/v3/ticker/price?symbol=${quoteSymbol.toUpperCase()}BTC`)
             let tomoPrice = response.data.price
 
             if (baseSymbol === 'btc') {
