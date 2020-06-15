@@ -19,7 +19,9 @@ There are some parameters you need to update:
 - `pkey`: Private key of wallet that has enough balance for trades
 - `baseToken` and `quoteToken`: Addresses of pair
 - `relayerUrl`: The url of DEX, e.g `https://dex.testnet.tomochain.com`
-- `orderbookLength`: Number of orders that needs to be created by the bot.
+- `orderbookLength`: Number of BUY/SELL orders in Orderbook
+- `speed`: `[miliseconds]` Speed of the creating orders of the bot. Recommend > 10 seconds
+- `step`: The price step of the orders in orderbook.
 
 You can get pairs information via DEX API, e.g: DEX testnet `https://dex.testnet.tomochain.com/api/pairs/data`
 
