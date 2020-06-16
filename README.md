@@ -22,6 +22,7 @@ There are some parameters you need to update:
 - `orderbookLength`: Number of BUY/SELL orders in Orderbook
 - `speed`: `[miliseconds]` Speed of the creating orders of the bot. Recommend > 10 seconds
 - `step`: The price step of the orders in orderbook ([L217](https://github.com/tomochain/tomox-market-maker/blob/6b8da681874b97fb24c86135851809b2928a25fc/commands/bot.js#L217))
+- `volume`: Side of an orders (in USD)
 
 You can get pairs information via DEX API, e.g: DEX testnet `https://dex.testnet.tomochain.com/api/pairs/data`
 
