@@ -8,7 +8,7 @@
     "lint": "eslint --cache ./ --ext .js"
   },
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "bignumber.js": "^9.0.0",
     "commander": "^3.0.2",
     "config": "^3.2.3",
